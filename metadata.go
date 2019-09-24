@@ -57,6 +57,7 @@ type Picture interface {
 type GetMetadata interface {
 	GetAllTagNames() []string
 	GetVersion() TagVersion
+	GetFileData() []byte // all another file data
 
 	GetTitle() (string, error)
 	GetArtist() (string, error)

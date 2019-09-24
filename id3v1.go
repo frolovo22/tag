@@ -1,7 +1,9 @@
 package tag
 
 import (
+	"bytes"
 	"io"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"time"
@@ -18,6 +20,13 @@ type ID3v1 struct {
 	ZeroByte byte   // length 1. If a track number is stored, this byte contains a binary 0.
 	Track    byte   // length 1. The number of the track on the album, or 0. Invalid, if previous byte is not a binary 0.
 	Genre    byte   // length 1. Index in a list of genres, or 255
+
+	// another file data
+	Data []byte
+}
+
+func (id3v1 *ID3v1) GetFileData() []byte {
+	return id3v1.Data
 }
 
 func (id3v1 *ID3v1) String() string {
@@ -66,13 +75,13 @@ func ReadID3v1Tags(input io.ReadSeeker) (*ID3v1, error) {
 	header.Type = marker
 
 	// Title
-	header.Title = string(headerByte[3:33])
+	header.Title = stringBeforeZero(headerByte[3:33])
 
 	// Artist
-	header.Artist = string(headerByte[33:63])
+	header.Artist = stringBeforeZero(headerByte[33:63])
 
 	// Album
-	header.Album = string(headerByte[63:93])
+	header.Album = stringBeforeZero(headerByte[63:93])
 
 	// Year
 	header.Year, err = strconv.Atoi(string(headerByte[93:97]))
@@ -83,11 +92,11 @@ func ReadID3v1Tags(input io.ReadSeeker) (*ID3v1, error) {
 	// Comment
 	// The track number is stored in the last two bytes of the comment field. If the comment is 29 or 30 characters long, no track number can be stored
 	if headerByte[125] == 0 {
-		header.Comment = string(headerByte[97:125])
+		header.Comment = stringBeforeZero(headerByte[97:125])
 		header.ZeroByte = 0
 		header.Track = headerByte[126]
 	} else {
-		header.Comment = string(headerByte[97:127])
+		header.Comment = stringBeforeZero(headerByte[97:127])
 		header.ZeroByte = headerByte[125]
 		header.Track = 0
 	}
@@ -96,7 +105,29 @@ func ReadID3v1Tags(input io.ReadSeeker) (*ID3v1, error) {
 	// Index in a list of genres, or 255
 	header.Genre = headerByte[127]
 
+	// Read another file data
+	_, err = input.Seek(0, io.SeekStart)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := ioutil.ReadAll(input)
+	if err != nil {
+		return nil, err
+	}
+	// without header
+	header.Data = data[:len(data)-128]
+
 	return &header, nil
+}
+
+// Return string without zero characters
+func stringBeforeZero(data []byte) string {
+	n := bytes.IndexByte(data, 0)
+	if n == -1 {
+		return string(data)
+	}
+	return string(data[:n])
 }
 
 func (id3v1 *ID3v1) SaveFile(path string) error {
@@ -110,6 +141,89 @@ func (id3v1 *ID3v1) SaveFile(path string) error {
 }
 
 func (id3v1 *ID3v1) Save(input io.WriteSeeker) error {
+	_, err := input.Write(id3v1.Data)
+	if err != nil {
+		return err
+	}
+
+	// id3v1 marker
+	_, err = input.Write([]byte("TAG"))
+	if err != nil {
+		return err
+	}
+
+	// Title
+	err = writeString(input, id3v1.Title, 30)
+	if err != nil {
+		return err
+	}
+
+	// Artist
+	err = writeString(input, id3v1.Artist, 30)
+	if err != nil {
+		return err
+	}
+
+	// Album
+	err = writeString(input, id3v1.Album, 30)
+	if err != nil {
+		return err
+	}
+
+	// Year
+	err = writeString(input, strconv.Itoa(id3v1.Year), 4)
+	if err != nil {
+		return err
+	}
+
+	// Track number
+	if id3v1.ZeroByte != 0 {
+		if len(id3v1.Comment) > 28 {
+			err = writeString(input, id3v1.Comment, 30)
+			if err != nil {
+				return err
+			}
+		} else {
+			// for fill track number
+			err = writeString(input, id3v1.Comment, 28)
+			_, err = input.Write([]byte{1, 0})
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+		err = writeString(input, id3v1.Comment, 28)
+		_, err = input.Write([]byte{0, id3v1.Track})
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err = input.Write([]byte{id3v1.Genre})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func writeString(input io.Writer, data string, size int) error {
+	if len(data) > size {
+		return ErrorWriteFile
+	}
+
+	bytes := make([]byte, size)
+	for i, val := range data {
+		bytes[i] = byte(val)
+	}
+	n, err := input.Write(bytes)
+	if err != nil {
+		return err
+	}
+	if n != size {
+		return ErrorWriteFile
+	}
+
 	return nil
 }
 
