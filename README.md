@@ -3,7 +3,7 @@
 # Install
 
 ```go 
-go get github.com/dencat/id3golang
+go get github.com/frolovo22/tag
 ```
 
 # Supported tags
