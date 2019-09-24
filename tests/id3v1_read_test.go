@@ -1,8 +1,8 @@
 package tests
 
 import (
+	"github.com/frolovo22/tag"
 	"github.com/stretchr/testify/assert"
-	"go-tag"
 	"testing"
 )
 
