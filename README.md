@@ -1,4 +1,6 @@
-# id3golang
+# Tag
+
+Its pure golang library
 
 # Install
 
