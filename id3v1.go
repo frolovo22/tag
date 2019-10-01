@@ -44,21 +44,22 @@ func (id3v1 *ID3v1) String() string {
 		trackNumber
 }
 
-func IsID3v1(input io.ReadSeeker) bool {
+func checkID3v1(input io.ReadSeeker) TagVersion {
 	// id3v1
 	data, err := seekAndRead(input, -128, io.SeekEnd, 3)
 	if err != nil {
-		return false
+		return TagVersionUndefined
 	}
+
 	marker := string(data)
 	if marker == "TAG" {
-		return true
+		return TagVersionID3v1
 	}
 
-	return false
+	return TagVersionUndefined
 }
 
-func ReadID3v1Tags(input io.ReadSeeker) (*ID3v1, error) {
+func ReadID3v1(input io.ReadSeeker) (*ID3v1, error) {
 	header := ID3v1{}
 
 	// 128 byte - Header size
@@ -212,11 +213,11 @@ func writeString(input io.Writer, data string, size int) error {
 		return ErrorWriteFile
 	}
 
-	bytes := make([]byte, size)
+	bytesStr := make([]byte, size)
 	for i, val := range data {
-		bytes[i] = byte(val)
+		bytesStr[i] = byte(val)
 	}
-	n, err := input.Write(bytes)
+	n, err := input.Write(bytesStr)
 	if err != nil {
 		return err
 	}
