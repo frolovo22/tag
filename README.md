@@ -26,7 +26,7 @@ go get github.com/frolovo22/tag
 | Composer          | -           | TCM     | TCOM    | TCOM    |
 | Conductor         | -           | TP3     | TPE3    | TPE3    |
 | Copyright         | -           | TCR     | TCOP    | TCOP    |
-| Description       | -           | TXX     | TIT2    | TIT2    |
+| Description       | -           | TXX     | TIT3    | TIT3    |
 | Disc Number       | -           | -       | TPOS    | TPOS    |
 | Encoded by        | -           | TEN     | TENC    | TENC    |
 | Track Number      | TrackNumber | TRK     | TRCK    | TRCK    |  

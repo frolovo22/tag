@@ -40,6 +40,7 @@ var (
 	ErrorIncorrectGenre    = errors.New("incorrect genre")
 	ErrorSeekFile          = errors.New("error seek file")
 	ErrorWriteFile         = errors.New("error write file")
+	ErrorIncorrectTag      = errors.New("incorrect tag")
 )
 
 type ImageType int
