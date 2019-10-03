@@ -10,31 +10,30 @@ go get github.com/frolovo22/tag
 
 # Supported tags
 
-| Name              | ID3v1       | ID3v2.2 | ID3v2.3 | ID3v2.4 |
-|-------------------|-------------|---------|---------|---------|
-| Title             | Title       | TT2     | TIT2    | TIT2    |
-| Artist            | Artist      | TP1     | TPE1    | TPE1    |
-| Album             | Album       | TOT     | TALB    | TALB    |
-| Year              | Year        | TYE     | TYER    | TDOR    |
-| Comment           | Comment     | COM     | COMM    | COMM    |
-| Genre             | Genre       | -       | TCON    | TCON    |
-| Album Artist      | -           | TOA     | TPE2    | TPE2    | 
-| Date              | -           | TIM     | TYER    | TDRC    |
-| Arranger          | -           | -       | IPLS    | TIPL    |
-| Author            | -           | TOL     | TOLY    | TOLY    |
-| BPM               | -           | BPM     | TBPM    | TBPM    |
-| Catalog Number    | -           | -       | TXXX    | TXXX    |
-| Compilation       | -           | -       | TCMP    | TCMP    |
-| Composer          | -           | TCM     | TCOM    | TCOM    |
-| Conductor         | -           | TP3     | TPE3    | TPE3    |
-| Copyright         | -           | TCR     | TCOP    | TCOP    |
-| Description       | -           | TXX     | TIT3    | TIT3    |
-| Disc Number       | -           | -       | TPOS    | TPOS    |
-| Encoded by        | -           | TEN     | TENC    | TENC    |
-| Track Number      | TrackNumber | TRK     | TRCK    | TRCK    |  
-| Picture           | -           | PIC     | APIC    | APIC    |
+| Name              | ID3v1       | ID3v2.2 | ID3v2.3               | ID3v2.4               |
+|-------------------|-------------|---------|-----------------------|-----------------------|
+| Title             | Title       | TT2     | TIT2                  | TIT2                  |
+| Artist            | Artist      | TP1     | TPE1                  | TPE1                  |
+| Album             | Album       | TOT     | TALB                  | TALB                  |
+| Year              | Year        | TYE     | TYER                  | TDOR                  |
+| Comment           | Comment     | COM     | COMM                  | COMM                  |
+| Genre             | Genre       | -       | TCON                  | TCON                  |
+| Album Artist      | -           | TOA     | TPE2                  | TPE2                  | 
+| Date              | -           | TIM     | TYER                  | TDRC                  |
+| Arranger          | -           | -       | IPLS                  | TIPL                  |
+| Author            | -           | TOL     | TOLY                  | TOLY                  |
+| BPM               | -           | BPM     | TBPM                  | TBPM                  |
+| Catalog Number    | -           | -       | TXXX:CATALOGNUMBER    | TXXX:CATALOGNUMBER    |
+| Compilation       | -           | -       | TCMP                  | TCMP                  |
+| Composer          | -           | TCM     | TCOM                  | TCOM                  |
+| Conductor         | -           | TP3     | TPE3                  | TPE3                  |
+| Copyright         | -           | TCR     | TCOP                  | TCOP                  |
+| Description       | -           | TXX     | TIT3                  | TIT3                  |
+| Disc Number       | -           | -       | TPOS                  | TPOS                  |
+| Encoded by        | -           | TEN     | TENC                  | TENC                  |
+| Track Number      | TrackNumber | TRK     | TRCK                  | TRCK                  |  
+| Picture           | -           | PIC     | APIC                  | APIC                  |
        
-
 # Status 
 In progress  
 Future features:
@@ -157,3 +156,42 @@ type SaveMetadata interface {
 }
 ```   
 
+Also you can read defined format. For Example:
+```go
+file, err := os.Open(path)
+if err != nil {
+	return err
+}
+defer file.Close()
+
+id3v2, err := tag.ReadID3v2(file)
+if err != nil {
+	return err
+}
+
+// Get tag value by name
+value, err := id3v2.GetString("TIT2")
+if err != nil {
+	return err
+}
+fmt.Println("title: " + value)
+
+// Set tag value
+err = id3v2.SetString("TIT2", "Title")
+if err != nil {
+	return err
+}
+
+// User defined tags
+value, err = id3v2.GetStringTXXX("MYTAG")
+if err != nil {
+	return err
+}
+fmt.Println("my tag: " + value)
+
+// Set user tag
+err = id3v2.SetStringTXXX("MYTAG222", "Dogs")
+if err != nil {
+	return err
+}
+``` 

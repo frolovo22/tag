@@ -289,8 +289,8 @@ func (id3v1 *ID3v1) GetBMP() (int, error) {
 	return 0, ErrorUnsupportedTag
 }
 
-func (id3v1 *ID3v1) GetCatalogNumber() (int, error) {
-	return 0, ErrorUnsupportedTag
+func (id3v1 *ID3v1) GetCatalogNumber() (string, error) {
+	return "", ErrorUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetCompilation() (string, error) {
@@ -402,7 +402,7 @@ func (id3v1 *ID3v1) SetBMP(bmp int) error {
 	return ErrorUnsupportedTag
 }
 
-func (id3v1 *ID3v1) SetCatalogNumber(catalogNumber int) error {
+func (id3v1 *ID3v1) SetCatalogNumber(catalogNumber string) error {
 	return ErrorUnsupportedTag
 }
 

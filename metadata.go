@@ -59,7 +59,7 @@ type GetMetadata interface {
 	GetArranger() (string, error)
 	GetAuthor() (string, error)
 	GetBMP() (int, error)
-	GetCatalogNumber() (int, error)
+	GetCatalogNumber() (string, error)
 	GetCompilation() (string, error)
 	GetComposer() (string, error)
 	GetConductor() (string, error)
@@ -83,7 +83,7 @@ type SetMetadata interface {
 	SetArranger(arranger string) error
 	SetAuthor(author string) error
 	SetBMP(bmp int) error
-	SetCatalogNumber(catalogNumber int) error
+	SetCatalogNumber(catalogNumber string) error
 	SetCompilation(compilation string) error
 	SetComposer(composer string) error
 	SetConductor(conductor string) error
