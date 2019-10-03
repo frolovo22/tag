@@ -128,7 +128,7 @@ func DecodeUTF16BE(b []byte) (string, error) {
 // In some parts of the tag it is inconvenient to use the
 // unsychronisation scheme because the size of unsynchronised data is
 // not known in advance, which is particularly problematic with size
-// descriptors. The solution in ID3v2 is to use synchsafe integers, in
+// descriptors. The solution in ID3v24 is to use synchsafe integers, in
 // which there can never be any false synchs. Synchsafe integers are
 // integers that keep its highest bit (bit 7) zeroed, making seven bits
 //out of eight available. Thus a 32 bit synchsafe integer can store 28

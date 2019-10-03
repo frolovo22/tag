@@ -48,7 +48,7 @@ Future features:
 | idv1.1 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 | idv2.2 | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
 | idv2.3 | <ul><li> - [x] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
-| idv2.4 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
+| idv2.4 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 | mp4    | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
 | FLAC   | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
 
@@ -164,7 +164,7 @@ if err != nil {
 }
 defer file.Close()
 
-id3v2, err := tag.ReadID3v2(file)
+id3v2, err := tag.ReadID3v24(file)
 if err != nil {
 	return err
 }
