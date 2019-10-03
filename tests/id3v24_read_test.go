@@ -59,10 +59,9 @@ func TestId3v24Read(t *testing.T) {
 	asrt.NoError(err)
 	asrt.Equal(777, bpm)
 
-	/* TODO: long keys TXXX:CATALOGNUMBER
-	catalogNumber, ok := id3.GetCatalogNumber()
-	asrt.Equal(true, ok)
-	asrt.Equal("TITLE1234567890123456789012345", catalogNumber)*/
+	catalogNumber, err := id3.GetCatalogNumber()
+	asrt.NoError(err)
+	asrt.Equal("catalogcat", catalogNumber)
 
 	compilation, err := id3.GetCompilation()
 	asrt.NoError(err)
