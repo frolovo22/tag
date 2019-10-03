@@ -2,6 +2,7 @@ package tag
 
 import (
 	"bytes"
+	"image"
 	"io"
 	"io/ioutil"
 	"os"
@@ -327,7 +328,7 @@ func (id3v1 *ID3v1) GetTrackNumber() (int, int, error) {
 	return 0, 0, ErrorTagNotFound
 }
 
-func (id3v1 *ID3v1) GetPicture() (Picture, error) {
+func (id3v1 *ID3v1) GetPicture() (image.Image, error) {
 	return nil, ErrorUnsupportedTag
 }
 
@@ -442,7 +443,7 @@ func (id3v1 *ID3v1) SetTrackNumber(number int, total int) error {
 	return nil
 }
 
-func (id3v1 *ID3v1) SetPicture(picture Picture) error {
+func (id3v1 *ID3v1) SetPicture(picture image.Image) error {
 	return ErrorUnsupportedTag
 }
 

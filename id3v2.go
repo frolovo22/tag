@@ -1,7 +1,11 @@
 package tag
 
 import (
+	"bytes"
 	"errors"
+	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"strconv"
 	"strings"
@@ -52,6 +56,13 @@ type ID3v2 struct {
 	Frames     []ID3v2Frame
 
 	Data []byte
+}
+
+type AttachedPicture struct {
+	MIME        string
+	PictureType byte
+	Description string
+	Data        []byte
 }
 
 func (id3v2 *ID3v2) GetAllTagNames() []string {
@@ -183,20 +194,31 @@ func (id3v2 *ID3v2) GetTrackNumber() (int, int, error) {
 	return track, track, err
 }
 
-func (id3v2 *ID3v2) GetPicture() (Picture, error) {
-	panic("implement me")
+func (id3v2 *ID3v2) GetPicture() (image.Image, error) {
+	pic, err := id3v2.GetAttachedPicture()
+	if err != nil {
+		return nil, err
+	}
+	switch pic.MIME {
+	case "image/jpeg":
+		return jpeg.Decode(bytes.NewReader(pic.Data))
+	case "image/png":
+		return png.Decode(bytes.NewReader(pic.Data))
+	default:
+		return nil, ErrorIncorrectTag
+	}
 }
 
 func (id3v2 *ID3v2) SetTitle(title string) error {
-	panic("implement me")
+	return id3v2.setString("TIT2", title)
 }
 
 func (id3v2 *ID3v2) SetArtist(artist string) error {
-	panic("implement me")
+	return id3v2.setString("TPE1", artist)
 }
 
 func (id3v2 *ID3v2) SetAlbum(album string) error {
-	panic("implement me")
+	return id3v2.setString("TALB", album)
 }
 
 func (id3v2 *ID3v2) SetYear(year int) error {
@@ -204,15 +226,15 @@ func (id3v2 *ID3v2) SetYear(year int) error {
 }
 
 func (id3v2 *ID3v2) SetComment(comment string) error {
-	panic("implement me")
+	return id3v2.setString("COMM", comment)
 }
 
 func (id3v2 *ID3v2) SetGenre(genre string) error {
-	panic("implement me")
+	return id3v2.setString("TCON", genre)
 }
 
 func (id3v2 *ID3v2) SetAlbumArtist(albumArtist string) error {
-	panic("implement me")
+	return id3v2.setString("TPE2", albumArtist)
 }
 
 func (id3v2 *ID3v2) SetDate(date time.Time) error {
@@ -220,11 +242,11 @@ func (id3v2 *ID3v2) SetDate(date time.Time) error {
 }
 
 func (id3v2 *ID3v2) SetArranger(arranger string) error {
-	panic("implement me")
+	return id3v2.setString("IPLS", arranger)
 }
 
 func (id3v2 *ID3v2) SetAuthor(author string) error {
-	panic("implement me")
+	return id3v2.setString("TOLY", author)
 }
 
 func (id3v2 *ID3v2) SetBMP(bmp int) error {
@@ -236,23 +258,23 @@ func (id3v2 *ID3v2) SetCatalogNumber(catalogNumber int) error {
 }
 
 func (id3v2 *ID3v2) SetCompilation(compilation string) error {
-	panic("implement me")
+	return id3v2.setString("TCMP", compilation)
 }
 
 func (id3v2 *ID3v2) SetComposer(composer string) error {
-	panic("implement me")
+	return id3v2.setString("TCOM", composer)
 }
 
 func (id3v2 *ID3v2) SetConductor(conductor string) error {
-	panic("implement me")
+	return id3v2.setString("TPE3", conductor)
 }
 
 func (id3v2 *ID3v2) SetCopyright(copyright string) error {
-	panic("implement me")
+	return id3v2.setString("TCOP", copyright)
 }
 
 func (id3v2 *ID3v2) SetDescription(description string) error {
-	panic("implement me")
+	return id3v2.setString("TIT3", description)
 }
 
 func (id3v2 *ID3v2) SetDiscNumber(number int, total int) error {
@@ -260,14 +282,14 @@ func (id3v2 *ID3v2) SetDiscNumber(number int, total int) error {
 }
 
 func (id3v2 *ID3v2) SetEncodedBy(encodedBy string) error {
-	panic("implement me")
+	return id3v2.setString("TENC", encodedBy)
 }
 
 func (id3v2 *ID3v2) SetTrackNumber(number int, total int) error {
 	panic("implement me")
 }
 
-func (id3v2 *ID3v2) SetPicture(picture Picture) error {
+func (id3v2 *ID3v2) SetPicture(picture image.Image) error {
 	panic("implement me")
 }
 
@@ -512,13 +534,29 @@ func ReadID3v2(input io.ReadSeeker) (*ID3v2, error) {
 	return &header, nil
 }
 
-func (id3v2 *ID3v2) getString(tagName string) (string, error) {
+func (id3v2 *ID3v2) getString(name string) (string, error) {
 	for _, val := range id3v2.Frames {
-		if val.Key == tagName {
+		if val.Key == name {
 			return GetString(val.Value)
 		}
 	}
 	return "", ErrorUnsupportedTag
+}
+
+func (id3v2 *ID3v2) setString(name string, value string) error {
+	frame := ID3v2Frame{
+		Key:   name,
+		Value: SetString(value),
+	}
+
+	for i, val := range id3v2.Frames {
+		if val.Key == name {
+			id3v2.Frames[i] = frame
+			return nil
+		}
+	}
+	id3v2.Frames = append(id3v2.Frames, frame)
+	return nil
 }
 
 func (id3v2 *ID3v2) getTimestamp(tagName string) (time.Time, error) {
@@ -544,4 +582,34 @@ func (id3v2 *ID3v2) getInt(tagName string) (int, error) {
 		}
 	}
 	return 0, ErrorUnsupportedTag
+}
+
+func (id3v2 *ID3v2) GetAttachedPicture() (*AttachedPicture, error) {
+	var picture AttachedPicture
+
+	picStr, err := id3v2.getString("APIC")
+	if err != nil {
+		return nil, err
+	}
+	values := strings.SplitN(picStr, "\x00", 3)
+	if len(values) != 3 {
+		return nil, ErrorIncorrectTag
+	}
+
+	// MIME
+	picture.MIME = values[0]
+
+	// Type
+	if len(values[1]) == 0 {
+		return nil, ErrorIncorrectTag
+	}
+	picture.PictureType = byte(values[1][0])
+
+	// Description
+	picture.Description = values[1][1:]
+
+	// Image data
+	picture.Data = []byte(values[2])
+
+	return &picture, nil
 }

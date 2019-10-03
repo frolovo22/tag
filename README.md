@@ -98,7 +98,7 @@ type GetMetadata interface {
 	GetDiscNumber() (int, int, error) // number, total
 	GetEncodedBy() (string, error)
 	GetTrackNumber() (int, int, error) // number, total
-	GetPicture() (Picture, error)
+	GetPicture() (image.Image, error)
 }
 
 type SetMetadata interface {
@@ -122,7 +122,7 @@ type SetMetadata interface {
 	SetDiscNumber(number int, total int) error
 	SetEncodedBy(encodedBy string) error
 	SetTrackNumber(number int, total int) error
-	SetPicture(picture Picture) error
+	SetPicture(picture image.Image) error
 }
 
 type DeleteMetadata interface {
