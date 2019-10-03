@@ -185,3 +185,10 @@ func GetString(b []byte) (string, error) {
 	}
 	return DecodeString(b[1:], TextEncoding(b))
 }
+
+func SetString(value string) []byte {
+	// Set UTF-8
+	result := []byte{0}
+	// Set data
+	return append(result, []byte(value)...)
+}
