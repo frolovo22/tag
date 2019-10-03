@@ -45,7 +45,7 @@ Future features:
 
 | Format | Read   | Set   | Delete |  Save |
 |--------|--------|-------|--------|-------|
-| idv1   | - [x]  | - [x] | - [x]  | - [x] |
+| idv1   | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 | idv1.1 | - [x]  | - [x] | - [x]  | - [x] |
 | idv2.2 | - [ ]  | - [ ] | - [ ]  | - [ ] |
 | idv2.3 | - [x]  | - [ ] | - [ ]  | - [ ] |
