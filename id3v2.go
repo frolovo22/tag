@@ -3,6 +3,7 @@ package tag
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -222,7 +223,12 @@ func (id3v2 *ID3v2) SetAlbum(album string) error {
 }
 
 func (id3v2 *ID3v2) SetYear(year int) error {
-	panic("implement me")
+	curDate, err := id3v2.getTimestamp("TDOR")
+	if err != nil {
+		// set only year
+		return id3v2.setTimestamp("TDOR", time.Date(year, 0, 0, 0, 0, 0, 0, time.Local))
+	}
+	return id3v2.setTimestamp("TDOR", time.Date(year, curDate.Month(), curDate.Day(), curDate.Hour(), curDate.Minute(), curDate.Second(), curDate.Nanosecond(), curDate.Location()))
 }
 
 func (id3v2 *ID3v2) SetComment(comment string) error {
@@ -238,7 +244,7 @@ func (id3v2 *ID3v2) SetAlbumArtist(albumArtist string) error {
 }
 
 func (id3v2 *ID3v2) SetDate(date time.Time) error {
-	panic("implement me")
+	return id3v2.setTimestamp("TDRC", date)
 }
 
 func (id3v2 *ID3v2) SetArranger(arranger string) error {
@@ -250,11 +256,11 @@ func (id3v2 *ID3v2) SetAuthor(author string) error {
 }
 
 func (id3v2 *ID3v2) SetBMP(bmp int) error {
-	panic("implement me")
+	return id3v2.setInt("TBMP", bmp)
 }
 
 func (id3v2 *ID3v2) SetCatalogNumber(catalogNumber int) error {
-	panic("implement me")
+	return id3v2.setInt("TXXX", catalogNumber)
 }
 
 func (id3v2 *ID3v2) SetCompilation(compilation string) error {
@@ -278,7 +284,7 @@ func (id3v2 *ID3v2) SetDescription(description string) error {
 }
 
 func (id3v2 *ID3v2) SetDiscNumber(number int, total int) error {
-	panic("implement me")
+	return id3v2.setString("TPOS", fmt.Sprintf("%d/%d", number, total))
 }
 
 func (id3v2 *ID3v2) SetEncodedBy(encodedBy string) error {
@@ -286,7 +292,8 @@ func (id3v2 *ID3v2) SetEncodedBy(encodedBy string) error {
 }
 
 func (id3v2 *ID3v2) SetTrackNumber(number int, total int) error {
-	panic("implement me")
+	// only number
+	return id3v2.setInt("TRCK", number)
 }
 
 func (id3v2 *ID3v2) SetPicture(picture image.Image) error {
@@ -559,8 +566,8 @@ func (id3v2 *ID3v2) setString(name string, value string) error {
 	return nil
 }
 
-func (id3v2 *ID3v2) getTimestamp(tagName string) (time.Time, error) {
-	str, err := id3v2.getString(tagName)
+func (id3v2 *ID3v2) getTimestamp(name string) (time.Time, error) {
+	str, err := id3v2.getString(name)
 	if err != nil {
 		return time.Now(), err
 	}
@@ -571,17 +578,21 @@ func (id3v2 *ID3v2) getTimestamp(tagName string) (time.Time, error) {
 	return result, nil
 }
 
-func (id3v2 *ID3v2) getInt(tagName string) (int, error) {
-	for _, val := range id3v2.Frames {
-		if val.Key == tagName {
-			intStr, err := GetString(val.Value)
-			if err != nil {
-				return 0, err
-			}
-			return strconv.Atoi(intStr)
-		}
+func (id3v2 *ID3v2) setTimestamp(name string, value time.Time) error {
+	str := value.Format("2006-01-02T15:04:05")
+	return id3v2.setString(name, str)
+}
+
+func (id3v2 *ID3v2) getInt(name string) (int, error) {
+	intStr, err := id3v2.getString(name)
+	if err != nil {
+		return 0, err
 	}
-	return 0, ErrorUnsupportedTag
+	return strconv.Atoi(intStr)
+}
+
+func (id3v2 *ID3v2) setInt(name string, value int) error {
+	return id3v2.setString(name, strconv.Itoa(value))
 }
 
 func (id3v2 *ID3v2) GetAttachedPicture() (*AttachedPicture, error) {
@@ -603,7 +614,7 @@ func (id3v2 *ID3v2) GetAttachedPicture() (*AttachedPicture, error) {
 	if len(values[1]) == 0 {
 		return nil, ErrorIncorrectTag
 	}
-	picture.PictureType = byte(values[1][0])
+	picture.PictureType = values[1][0]
 
 	// Description
 	picture.Description = values[1][1:]
@@ -612,4 +623,20 @@ func (id3v2 *ID3v2) GetAttachedPicture() (*AttachedPicture, error) {
 	picture.Data = []byte(values[2])
 
 	return &picture, nil
+}
+
+func (id3v2 *ID3v2) deleteTag(name string) error {
+	index := -1
+	for i, val := range id3v2.Frames {
+		if val.Key == name {
+			index = i
+			break
+		}
+	}
+	// already deleted
+	if index == -1 {
+		return nil
+	}
+	id3v2.Frames = append(id3v2.Frames[:index], id3v2.Frames[index+1:]...)
+	return nil
 }
