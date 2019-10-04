@@ -14,60 +14,53 @@ import (
 	"time"
 )
 
-type Id3v24Flags byte
+type Id3v23Flags byte
 
-func (flags Id3v24Flags) String() string {
+func (flags Id3v23Flags) String() string {
 	return strconv.Itoa(int(flags))
 }
 
-func (flags Id3v24Flags) IsUnsynchronisation() bool {
+func (flags Id3v23Flags) IsUnsynchronisation() bool {
 	return GetBit(byte(flags), 7) == 1
 }
 
-func (flags Id3v24Flags) SetUnsynchronisation(data bool) {
+func (flags Id3v23Flags) SetUnsynchronisation(data bool) {
 	SetBit((*byte)(&flags), data, 7)
 }
 
-func (flags Id3v24Flags) HasExtendedHeader() bool {
+func (flags Id3v23Flags) HasExtendedHeader() bool {
 	return GetBit(byte(flags), 6) == 1
 }
 
-func (flags Id3v24Flags) SetExtendedHeader(data bool) {
+func (flags Id3v23Flags) SetExtendedHeader(data bool) {
 	SetBit((*byte)(&flags), data, 7)
 }
 
-func (flags Id3v24Flags) IsExperimentalIndicator() bool {
+func (flags Id3v23Flags) IsExperimentalIndicator() bool {
 	return GetBit(byte(flags), 5) == 1
 }
 
-func (flags Id3v24Flags) SetExperimentalIndicator(data bool) {
+func (flags Id3v23Flags) SetExperimentalIndicator(data bool) {
 	SetBit((*byte)(&flags), data, 7)
 }
 
-type ID3v24Frame struct {
+type ID3v23Frame struct {
 	Key   string
 	Value []byte
 }
 
-type ID3v24 struct {
+type ID3v23 struct {
 	Marker     string // Always 'ID3'
 	Version    TagVersion
 	SubVersion int
-	Flags      Id3v24Flags
+	Flags      Id3v23Flags
 	Length     int
-	Frames     []ID3v24Frame
+	Frames     []ID3v23Frame
 
 	Data []byte
 }
 
-type AttachedPicture struct {
-	MIME        string
-	PictureType byte
-	Description string
-	Data        []byte
-}
-
-func (id3v2 *ID3v24) GetAllTagNames() []string {
+func (id3v2 *ID3v23) GetAllTagNames() []string {
 	var result []string
 	for _, value := range id3v2.Frames {
 		result = append(result, value.Key)
@@ -75,32 +68,32 @@ func (id3v2 *ID3v24) GetAllTagNames() []string {
 	return result
 }
 
-func (id3v2 *ID3v24) GetVersion() TagVersion {
+func (id3v2 *ID3v23) GetVersion() TagVersion {
 	return id3v2.Version
 }
 
-func (id3v2 *ID3v24) GetFileData() []byte {
+func (id3v2 *ID3v23) GetFileData() []byte {
 	return id3v2.Data
 }
 
-func (id3v2 *ID3v24) GetTitle() (string, error) {
+func (id3v2 *ID3v23) GetTitle() (string, error) {
 	return id3v2.GetString("TIT2")
 }
 
-func (id3v2 *ID3v24) GetArtist() (string, error) {
+func (id3v2 *ID3v23) GetArtist() (string, error) {
 	return id3v2.GetString("TPE1")
 }
 
-func (id3v2 *ID3v24) GetAlbum() (string, error) {
+func (id3v2 *ID3v23) GetAlbum() (string, error) {
 	return id3v2.GetString("TALB")
 }
 
-func (id3v2 *ID3v24) GetYear() (int, error) {
-	date, err := id3v2.GetTimestamp("TDOR")
+func (id3v2 *ID3v23) GetYear() (int, error) {
+	date, err := id3v2.GetTimestamp("TYEAR")
 	return date.Year(), err
 }
 
-func (id3v2 *ID3v24) GetComment() (string, error) {
+func (id3v2 *ID3v23) GetComment() (string, error) {
 	// id3v2
 	// Comment struct must be greater than 4
 	// [lang \x00 text] - comment format
@@ -119,55 +112,55 @@ func (id3v2 *ID3v24) GetComment() (string, error) {
 	return commentStr[4:], nil
 }
 
-func (id3v2 *ID3v24) GetGenre() (string, error) {
+func (id3v2 *ID3v23) GetGenre() (string, error) {
 	return id3v2.GetString("TCON")
 }
 
-func (id3v2 *ID3v24) GetAlbumArtist() (string, error) {
+func (id3v2 *ID3v23) GetAlbumArtist() (string, error) {
 	return id3v2.GetString("TPE2")
 }
 
-func (id3v2 *ID3v24) GetDate() (time.Time, error) {
-	return id3v2.GetTimestamp("TDRC")
+func (id3v2 *ID3v23) GetDate() (time.Time, error) {
+	return id3v2.GetTimestamp("TYEAR")
 }
 
-func (id3v2 *ID3v24) GetArranger() (string, error) {
-	return id3v2.GetString("TIPL")
+func (id3v2 *ID3v23) GetArranger() (string, error) {
+	return id3v2.GetString("IPLS")
 }
 
-func (id3v2 *ID3v24) GetAuthor() (string, error) {
+func (id3v2 *ID3v23) GetAuthor() (string, error) {
 	return id3v2.GetString("TOLY")
 }
 
-func (id3v2 *ID3v24) GetBMP() (int, error) {
+func (id3v2 *ID3v23) GetBMP() (int, error) {
 	return id3v2.GetInt("TBPM")
 }
 
-func (id3v2 *ID3v24) GetCatalogNumber() (string, error) {
+func (id3v2 *ID3v23) GetCatalogNumber() (string, error) {
 	return id3v2.GetStringTXXX("CATALOGNUMBER")
 }
 
-func (id3v2 *ID3v24) GetCompilation() (string, error) {
+func (id3v2 *ID3v23) GetCompilation() (string, error) {
 	return id3v2.GetString("TCMP")
 }
 
-func (id3v2 *ID3v24) GetComposer() (string, error) {
+func (id3v2 *ID3v23) GetComposer() (string, error) {
 	return id3v2.GetString("TCOM")
 }
 
-func (id3v2 *ID3v24) GetConductor() (string, error) {
+func (id3v2 *ID3v23) GetConductor() (string, error) {
 	return id3v2.GetString("TPE3")
 }
 
-func (id3v2 *ID3v24) GetCopyright() (string, error) {
+func (id3v2 *ID3v23) GetCopyright() (string, error) {
 	return id3v2.GetString("TCOP")
 }
 
-func (id3v2 *ID3v24) GetDescription() (string, error) {
+func (id3v2 *ID3v23) GetDescription() (string, error) {
 	return id3v2.GetString("TIT3")
 }
 
-func (id3v2 *ID3v24) GetDiscNumber() (int, int, error) {
+func (id3v2 *ID3v23) GetDiscNumber() (int, int, error) {
 	dickNumber, err := id3v2.GetString("TPOS")
 	if err != nil {
 		return 0, 0, err
@@ -187,16 +180,16 @@ func (id3v2 *ID3v24) GetDiscNumber() (int, int, error) {
 	return number, total, nil
 }
 
-func (id3v2 *ID3v24) GetEncodedBy() (string, error) {
+func (id3v2 *ID3v23) GetEncodedBy() (string, error) {
 	return id3v2.GetString("TENC")
 }
 
-func (id3v2 *ID3v24) GetTrackNumber() (int, int, error) {
+func (id3v2 *ID3v23) GetTrackNumber() (int, int, error) {
 	track, err := id3v2.GetInt("TRCK")
 	return track, track, err
 }
 
-func (id3v2 *ID3v24) GetPicture() (image.Image, error) {
+func (id3v2 *ID3v23) GetPicture() (image.Image, error) {
 	pic, err := id3v2.GetAttachedPicture()
 	if err != nil {
 		return nil, err
@@ -211,93 +204,93 @@ func (id3v2 *ID3v24) GetPicture() (image.Image, error) {
 	}
 }
 
-func (id3v2 *ID3v24) SetTitle(title string) error {
+func (id3v2 *ID3v23) SetTitle(title string) error {
 	return id3v2.SetString("TIT2", title)
 }
 
-func (id3v2 *ID3v24) SetArtist(artist string) error {
+func (id3v2 *ID3v23) SetArtist(artist string) error {
 	return id3v2.SetString("TPE1", artist)
 }
 
-func (id3v2 *ID3v24) SetAlbum(album string) error {
+func (id3v2 *ID3v23) SetAlbum(album string) error {
 	return id3v2.SetString("TALB", album)
 }
 
-func (id3v2 *ID3v24) SetYear(year int) error {
-	curDate, err := id3v2.GetTimestamp("TDOR")
+func (id3v2 *ID3v23) SetYear(year int) error {
+	curDate, err := id3v2.GetTimestamp("TYER")
 	if err != nil {
 		// set only year
-		return id3v2.SetTimestamp("TDOR", time.Date(year, 0, 0, 0, 0, 0, 0, time.Local))
+		return id3v2.SetTimestamp("TYER", time.Date(year, 0, 0, 0, 0, 0, 0, time.Local))
 	}
-	return id3v2.SetTimestamp("TDOR", time.Date(year, curDate.Month(), curDate.Day(), curDate.Hour(), curDate.Minute(), curDate.Second(), curDate.Nanosecond(), curDate.Location()))
+	return id3v2.SetTimestamp("TYER", time.Date(year, curDate.Month(), curDate.Day(), curDate.Hour(), curDate.Minute(), curDate.Second(), curDate.Nanosecond(), curDate.Location()))
 }
 
-func (id3v2 *ID3v24) SetComment(comment string) error {
+func (id3v2 *ID3v23) SetComment(comment string) error {
 	return id3v2.SetString("COMM", comment)
 }
 
-func (id3v2 *ID3v24) SetGenre(genre string) error {
+func (id3v2 *ID3v23) SetGenre(genre string) error {
 	return id3v2.SetString("TCON", genre)
 }
 
-func (id3v2 *ID3v24) SetAlbumArtist(albumArtist string) error {
+func (id3v2 *ID3v23) SetAlbumArtist(albumArtist string) error {
 	return id3v2.SetString("TPE2", albumArtist)
 }
 
-func (id3v2 *ID3v24) SetDate(date time.Time) error {
-	return id3v2.SetTimestamp("TDRC", date)
+func (id3v2 *ID3v23) SetDate(date time.Time) error {
+	return id3v2.SetTimestamp("TYER", date)
 }
 
-func (id3v2 *ID3v24) SetArranger(arranger string) error {
+func (id3v2 *ID3v23) SetArranger(arranger string) error {
 	return id3v2.SetString("IPLS", arranger)
 }
 
-func (id3v2 *ID3v24) SetAuthor(author string) error {
+func (id3v2 *ID3v23) SetAuthor(author string) error {
 	return id3v2.SetString("TOLY", author)
 }
 
-func (id3v2 *ID3v24) SetBMP(bmp int) error {
+func (id3v2 *ID3v23) SetBMP(bmp int) error {
 	return id3v2.SetInt("TBMP", bmp)
 }
 
-func (id3v2 *ID3v24) SetCatalogNumber(catalogNumber string) error {
+func (id3v2 *ID3v23) SetCatalogNumber(catalogNumber string) error {
 	return id3v2.SetString("TXXX", catalogNumber)
 }
 
-func (id3v2 *ID3v24) SetCompilation(compilation string) error {
+func (id3v2 *ID3v23) SetCompilation(compilation string) error {
 	return id3v2.SetString("TCMP", compilation)
 }
 
-func (id3v2 *ID3v24) SetComposer(composer string) error {
+func (id3v2 *ID3v23) SetComposer(composer string) error {
 	return id3v2.SetString("TCOM", composer)
 }
 
-func (id3v2 *ID3v24) SetConductor(conductor string) error {
+func (id3v2 *ID3v23) SetConductor(conductor string) error {
 	return id3v2.SetString("TPE3", conductor)
 }
 
-func (id3v2 *ID3v24) SetCopyright(copyright string) error {
+func (id3v2 *ID3v23) SetCopyright(copyright string) error {
 	return id3v2.SetString("TCOP", copyright)
 }
 
-func (id3v2 *ID3v24) SetDescription(description string) error {
+func (id3v2 *ID3v23) SetDescription(description string) error {
 	return id3v2.SetString("TIT3", description)
 }
 
-func (id3v2 *ID3v24) SetDiscNumber(number int, total int) error {
+func (id3v2 *ID3v23) SetDiscNumber(number int, total int) error {
 	return id3v2.SetString("TPOS", fmt.Sprintf("%d/%d", number, total))
 }
 
-func (id3v2 *ID3v24) SetEncodedBy(encodedBy string) error {
+func (id3v2 *ID3v23) SetEncodedBy(encodedBy string) error {
 	return id3v2.SetString("TENC", encodedBy)
 }
 
-func (id3v2 *ID3v24) SetTrackNumber(number int, total int) error {
+func (id3v2 *ID3v23) SetTrackNumber(number int, total int) error {
 	// only number
 	return id3v2.SetInt("TRCK", number)
 }
 
-func (id3v2 *ID3v24) SetPicture(picture image.Image) error {
+func (id3v2 *ID3v23) SetPicture(picture image.Image) error {
 	// Only PNG
 	buf := new(bytes.Buffer)
 	err := png.Encode(buf, picture)
@@ -323,96 +316,96 @@ func (id3v2 *ID3v24) SetPicture(picture image.Image) error {
 	return id3v2.SetAttachedPicture(attacheched)
 }
 
-func (id3v2 *ID3v24) DeleteAll() error {
-	id3v2.Frames = []ID3v24Frame{}
+func (id3v2 *ID3v23) DeleteAll() error {
+	id3v2.Frames = []ID3v23Frame{}
 	return nil
 }
 
-func (id3v2 *ID3v24) DeleteTitle() error {
+func (id3v2 *ID3v23) DeleteTitle() error {
 	return id3v2.DeleteTag("TIT2")
 }
 
-func (id3v2 *ID3v24) DeleteArtist() error {
+func (id3v2 *ID3v23) DeleteArtist() error {
 	return id3v2.DeleteTag("TPE1")
 }
 
-func (id3v2 *ID3v24) DeleteAlbum() error {
+func (id3v2 *ID3v23) DeleteAlbum() error {
 	return id3v2.DeleteTag("TALB")
 }
 
-func (id3v2 *ID3v24) DeleteYear() error {
-	return id3v2.DeleteTag("TDOR")
+func (id3v2 *ID3v23) DeleteYear() error {
+	return id3v2.DeleteTag("TYER")
 }
 
-func (id3v2 *ID3v24) DeleteComment() error {
+func (id3v2 *ID3v23) DeleteComment() error {
 	return id3v2.DeleteTag("COMM")
 }
 
-func (id3v2 *ID3v24) DeleteGenre() error {
+func (id3v2 *ID3v23) DeleteGenre() error {
 	return id3v2.DeleteTag("TCON")
 }
 
-func (id3v2 *ID3v24) DeleteAlbumArtist() error {
+func (id3v2 *ID3v23) DeleteAlbumArtist() error {
 	return id3v2.DeleteTag("TPE2")
 }
 
-func (id3v2 *ID3v24) DeleteDate() error {
-	return id3v2.DeleteTag("TDRC")
+func (id3v2 *ID3v23) DeleteDate() error {
+	return id3v2.DeleteTag("TYER")
 }
 
-func (id3v2 *ID3v24) DeleteArranger() error {
+func (id3v2 *ID3v23) DeleteArranger() error {
 	return id3v2.DeleteTag("IPLS")
 }
 
-func (id3v2 *ID3v24) DeleteAuthor() error {
+func (id3v2 *ID3v23) DeleteAuthor() error {
 	return id3v2.DeleteTag("TOLY")
 }
 
-func (id3v2 *ID3v24) DeleteBMP() error {
+func (id3v2 *ID3v23) DeleteBMP() error {
 	return id3v2.DeleteTag("TBMP")
 }
 
-func (id3v2 *ID3v24) DeleteCatalogNumber() error {
+func (id3v2 *ID3v23) DeleteCatalogNumber() error {
 	return id3v2.DeleteTagTXXX("CATALOGNUMBER")
 }
 
-func (id3v2 *ID3v24) DeleteCompilation() error {
+func (id3v2 *ID3v23) DeleteCompilation() error {
 	return id3v2.DeleteTag("TCMP")
 }
 
-func (id3v2 *ID3v24) DeleteComposer() error {
+func (id3v2 *ID3v23) DeleteComposer() error {
 	return id3v2.DeleteTag("TCOM")
 }
 
-func (id3v2 *ID3v24) DeleteConductor() error {
+func (id3v2 *ID3v23) DeleteConductor() error {
 	return id3v2.DeleteTag("TPE3")
 }
 
-func (id3v2 *ID3v24) DeleteCopyright() error {
+func (id3v2 *ID3v23) DeleteCopyright() error {
 	return id3v2.DeleteTag("TCOP")
 }
 
-func (id3v2 *ID3v24) DeleteDescription() error {
+func (id3v2 *ID3v23) DeleteDescription() error {
 	return id3v2.DeleteTag("TIT3")
 }
 
-func (id3v2 *ID3v24) DeleteDiscNumber() error {
+func (id3v2 *ID3v23) DeleteDiscNumber() error {
 	return id3v2.DeleteTag("TPOS")
 }
 
-func (id3v2 *ID3v24) DeleteEncodedBy() error {
+func (id3v2 *ID3v23) DeleteEncodedBy() error {
 	return id3v2.DeleteTag("TENC")
 }
 
-func (id3v2 *ID3v24) DeleteTrackNumber() error {
+func (id3v2 *ID3v23) DeleteTrackNumber() error {
 	return id3v2.DeleteTag("TRCK")
 }
 
-func (id3v2 *ID3v24) DeletePicture() error {
+func (id3v2 *ID3v23) DeletePicture() error {
 	return id3v2.DeleteTag("APIC")
 }
 
-func (id3v2 *ID3v24) SaveFile(path string) error {
+func (id3v2 *ID3v23) SaveFile(path string) error {
 	file, err := os.Create(path)
 	if err != nil {
 		return err
@@ -422,7 +415,7 @@ func (id3v2 *ID3v24) SaveFile(path string) error {
 	return id3v2.Save(file)
 }
 
-func (id3v2 *ID3v24) Save(input io.WriteSeeker) error {
+func (id3v2 *ID3v23) Save(input io.WriteSeeker) error {
 	// write header
 	err := id3v2.writeHeaderId3v24(input)
 	if err != nil {
@@ -443,7 +436,7 @@ func (id3v2 *ID3v24) Save(input io.WriteSeeker) error {
 	return nil
 }
 
-func (id3v2 *ID3v24) writeHeaderId3v24(writer io.Writer) error {
+func (id3v2 *ID3v23) writeHeaderId3v24(writer io.Writer) error {
 	headerByte := make([]byte, 10)
 
 	// ID3
@@ -478,7 +471,7 @@ func (id3v2 *ID3v24) writeHeaderId3v24(writer io.Writer) error {
 	return nil
 }
 
-func (id3v2 *ID3v24) writeFramesId3v24(writer io.Writer) error {
+func (id3v2 *ID3v23) writeFramesId3v24(writer io.Writer) error {
 	for _, tag := range id3v2.Frames {
 		header := make([]byte, 10)
 
@@ -510,7 +503,7 @@ func (id3v2 *ID3v24) writeFramesId3v24(writer io.Writer) error {
 	return nil
 }
 
-func (id3v2 *ID3v24) getFramesLength() int {
+func (id3v2 *ID3v23) getFramesLength() int {
 	result := 0
 	for _, tag := range id3v2.Frames {
 		// 10 - size of tag header
@@ -519,7 +512,7 @@ func (id3v2 *ID3v24) getFramesLength() int {
 	return result
 }
 
-func (id3v2 *ID3v24) String() string {
+func (id3v2 *ID3v23) String() string {
 	result := "Marker: " + id3v2.Marker + "\n" +
 		"Version: " + id3v2.Version.String() + "\n" +
 		"Subversion: " + strconv.Itoa(id3v2.SubVersion) + "\n" +
@@ -533,7 +526,7 @@ func (id3v2 *ID3v24) String() string {
 	return result
 }
 
-func checkID3v24(input io.ReadSeeker) TagVersion {
+func checkID3v23(input io.ReadSeeker) TagVersion {
 	if input == nil {
 		return TagVersionUndefined
 	}
@@ -551,15 +544,15 @@ func checkID3v24(input io.ReadSeeker) TagVersion {
 	}
 
 	versionByte := data[3]
-	if versionByte != 4 {
+	if versionByte != 3 {
 		return TagVersionUndefined
 	}
 
-	return TagVersionID3v24
+	return TagVersionID3v23
 }
 
-func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
-	header := ID3v24{}
+func ReadID3v23(input io.ReadSeeker) (*ID3v23, error) {
+	header := ID3v23{}
 	if input == nil {
 		return nil, ErrorEmptyFile
 	}
@@ -593,7 +586,7 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 
 	// Version
 	versionByte := headerByte[3]
-	if versionByte != 4 {
+	if versionByte != 3 {
 		return nil, ErrorUnsupportedFormat
 	}
 
@@ -602,14 +595,14 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 	header.SubVersion = int(subVersionByte)
 
 	// Flags
-	header.Flags = Id3v24Flags(headerByte[5])
+	header.Flags = Id3v23Flags(headerByte[5])
 
 	// Length
 	length := ByteToIntSynchsafe(headerByte[6:10])
 	header.Length = length
 
 	// Extended headers
-	header.Frames = []ID3v24Frame{}
+	header.Frames = []ID3v23Frame{}
 	curRead := 0
 	for curRead < length {
 		bytesExtendedHeader := make([]byte, 10)
@@ -639,7 +632,7 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 			return nil, errors.New("error extended value length")
 		}
 
-		header.Frames = append(header.Frames, ID3v24Frame{
+		header.Frames = append(header.Frames, ID3v23Frame{
 			key,
 			bytesExtendedValue,
 		})
@@ -654,7 +647,7 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 	return &header, nil
 }
 
-func (id3v2 *ID3v24) GetString(name string) (string, error) {
+func (id3v2 *ID3v23) GetString(name string) (string, error) {
 	for _, val := range id3v2.Frames {
 		if val.Key == name {
 			return GetString(val.Value)
@@ -663,8 +656,8 @@ func (id3v2 *ID3v24) GetString(name string) (string, error) {
 	return "", ErrorTagNotFound
 }
 
-func (id3v2 *ID3v24) SetString(name string, value string) error {
-	frame := ID3v24Frame{
+func (id3v2 *ID3v23) SetString(name string, value string) error {
+	frame := ID3v23Frame{
 		Key:   name,
 		Value: SetString(value),
 	}
@@ -679,7 +672,7 @@ func (id3v2 *ID3v24) SetString(name string, value string) error {
 	return nil
 }
 
-func (id3v2 *ID3v24) GetTimestamp(name string) (time.Time, error) {
+func (id3v2 *ID3v23) GetTimestamp(name string) (time.Time, error) {
 	str, err := id3v2.GetString(name)
 	if err != nil {
 		return time.Now(), err
@@ -691,12 +684,12 @@ func (id3v2 *ID3v24) GetTimestamp(name string) (time.Time, error) {
 	return result, nil
 }
 
-func (id3v2 *ID3v24) SetTimestamp(name string, value time.Time) error {
+func (id3v2 *ID3v23) SetTimestamp(name string, value time.Time) error {
 	str := value.Format("2006-01-02T15:04:05")
 	return id3v2.SetString(name, str)
 }
 
-func (id3v2 *ID3v24) GetInt(name string) (int, error) {
+func (id3v2 *ID3v23) GetInt(name string) (int, error) {
 	intStr, err := id3v2.GetString(name)
 	if err != nil {
 		return 0, err
@@ -704,11 +697,11 @@ func (id3v2 *ID3v24) GetInt(name string) (int, error) {
 	return strconv.Atoi(intStr)
 }
 
-func (id3v2 *ID3v24) SetInt(name string, value int) error {
+func (id3v2 *ID3v23) SetInt(name string, value int) error {
 	return id3v2.SetString(name, strconv.Itoa(value))
 }
 
-func (id3v2 *ID3v24) GetAttachedPicture() (*AttachedPicture, error) {
+func (id3v2 *ID3v23) GetAttachedPicture() (*AttachedPicture, error) {
 	var picture AttachedPicture
 
 	picStr, err := id3v2.GetString("APIC")
@@ -738,7 +731,7 @@ func (id3v2 *ID3v24) GetAttachedPicture() (*AttachedPicture, error) {
 	return &picture, nil
 }
 
-func (id3v2 *ID3v24) SetAttachedPicture(picture *AttachedPicture) error {
+func (id3v2 *ID3v23) SetAttachedPicture(picture *AttachedPicture) error {
 	// set UTF-8
 	result := []byte{0}
 
@@ -759,7 +752,7 @@ func (id3v2 *ID3v24) SetAttachedPicture(picture *AttachedPicture) error {
 	return id3v2.SetString("APIC", string(result))
 }
 
-func (id3v2 *ID3v24) DeleteTag(name string) error {
+func (id3v2 *ID3v23) DeleteTag(name string) error {
 	index := -1
 	for i, val := range id3v2.Frames {
 		if val.Key == name {
@@ -775,7 +768,7 @@ func (id3v2 *ID3v24) DeleteTag(name string) error {
 	return nil
 }
 
-func (id3v2 *ID3v24) DeleteTagTXXX(name string) error {
+func (id3v2 *ID3v23) DeleteTagTXXX(name string) error {
 	index := -1
 	for i, val := range id3v2.Frames {
 		if val.Key == "TXXX" {
@@ -806,7 +799,7 @@ func (id3v2 *ID3v24) DeleteTagTXXX(name string) error {
 // Text encoding     $xx
 // Description       <text string according to encoding> $00 (00)
 // Value             <text string according to encoding>
-func (id3v2 *ID3v24) GetStringTXXX(name string) (string, error) {
+func (id3v2 *ID3v23) GetStringTXXX(name string) (string, error) {
 	for _, val := range id3v2.Frames {
 		if val.Key == "TXXX" {
 			str, err := GetString(val.Value)
@@ -825,8 +818,8 @@ func (id3v2 *ID3v24) GetStringTXXX(name string) (string, error) {
 	return "", ErrorTagNotFound
 }
 
-func (id3v2 *ID3v24) SetStringTXXX(name string, value string) error {
-	result := ID3v24Frame{
+func (id3v2 *ID3v23) SetStringTXXX(name string, value string) error {
+	result := ID3v23Frame{
 		Key:   "TXXX",
 		Value: SetString(name + "\x00" + value),
 	}
@@ -853,7 +846,7 @@ func (id3v2 *ID3v24) SetStringTXXX(name string, value string) error {
 	return nil
 }
 
-func (id3v2 *ID3v24) GetIntTXXX(name string) (int, error) {
+func (id3v2 *ID3v23) GetIntTXXX(name string) (int, error) {
 	str, err := id3v2.GetStringTXXX(name)
 	if err != nil {
 		return 0, err
