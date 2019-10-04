@@ -22,6 +22,7 @@ func Read(input io.ReadSeeker) (Metadata, error) {
 		return ReadID3v1(input)
 	case TagVersionID3v22:
 	case TagVersionID3v23:
+		return ReadID3v23(input)
 	case TagVersionID3v24:
 		return ReadID3v24(input)
 	default:
@@ -31,12 +32,16 @@ func Read(input io.ReadSeeker) (Metadata, error) {
 }
 
 func CheckVersion(input io.ReadSeeker) TagVersion {
-	if checkID3v1(input) != TagVersionUndefined {
-		return TagVersionID3v1
-	}
-
 	if checkID3v24(input) != TagVersionUndefined {
 		return TagVersionID3v24
+	}
+
+	if checkID3v23(input) != TagVersionUndefined {
+		return TagVersionID3v23
+	}
+
+	if checkID3v1(input) != TagVersionUndefined {
+		return TagVersionID3v1
 	}
 
 	return TagVersionUndefined
