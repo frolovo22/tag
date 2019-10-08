@@ -447,26 +447,15 @@ func (id3v2 *ID3v24) writeHeaderId3v24(writer io.Writer) error {
 	headerByte := make([]byte, 10)
 
 	// ID3
-	headerByte[0] = 'I'
-	headerByte[1] = 'D'
-	headerByte[2] = '3'
+	copy(headerByte[0:3], "ID3")
 
-	// Version
-	headerByte[3] = 4
-
-	// Subversion
-	headerByte[4] = 0
-
-	// Flags
-	headerByte[5] = 0
+	// Version, Subversion, Flags
+	copy(headerByte[3:6], []byte{4, 0, 0})
 
 	// Length
 	length := id3v2.getFramesLength()
 	lengthByte := IntToByteSynchsafe(length)
-	headerByte[6] = lengthByte[0]
-	headerByte[7] = lengthByte[1]
-	headerByte[8] = lengthByte[2]
-	headerByte[9] = lengthByte[3]
+	copy(headerByte[6:10], lengthByte)
 
 	nWriten, err := writer.Write(headerByte)
 	if err != nil {
