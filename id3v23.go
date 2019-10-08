@@ -417,13 +417,13 @@ func (id3v2 *ID3v23) SaveFile(path string) error {
 
 func (id3v2 *ID3v23) Save(input io.WriteSeeker) error {
 	// write header
-	err := id3v2.writeHeaderId3v24(input)
+	err := id3v2.writeHeaderId3v23(input)
 	if err != nil {
 		return err
 	}
 
 	// write tags
-	err = id3v2.writeFramesId3v24(input)
+	err = id3v2.writeFramesId3v23(input)
 	if err != nil {
 		return err
 	}
@@ -436,30 +436,19 @@ func (id3v2 *ID3v23) Save(input io.WriteSeeker) error {
 	return nil
 }
 
-func (id3v2 *ID3v23) writeHeaderId3v24(writer io.Writer) error {
+func (id3v2 *ID3v23) writeHeaderId3v23(writer io.Writer) error {
 	headerByte := make([]byte, 10)
 
 	// ID3
-	headerByte[0] = 'I'
-	headerByte[1] = 'D'
-	headerByte[2] = '3'
+	copy(headerByte[0:3], "ID3")
 
-	// Version
-	headerByte[3] = 4
-
-	// Subversion
-	headerByte[4] = 0
-
-	// Flags
-	headerByte[5] = 0
+	// Version, Subversion, Flags
+	copy(headerByte[3:6], []byte{3, 0, 0})
 
 	// Length
 	length := id3v2.getFramesLength()
 	lengthByte := IntToByteSynchsafe(length)
-	headerByte[6] = lengthByte[0]
-	headerByte[7] = lengthByte[1]
-	headerByte[8] = lengthByte[2]
-	headerByte[9] = lengthByte[3]
+	copy(headerByte[6:10], lengthByte)
 
 	nWriten, err := writer.Write(headerByte)
 	if err != nil {
@@ -471,7 +460,7 @@ func (id3v2 *ID3v23) writeHeaderId3v24(writer io.Writer) error {
 	return nil
 }
 
-func (id3v2 *ID3v23) writeFramesId3v24(writer io.Writer) error {
+func (id3v2 *ID3v23) writeFramesId3v23(writer io.Writer) error {
 	for _, tag := range id3v2.Frames {
 		header := make([]byte, 10)
 

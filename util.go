@@ -158,10 +158,6 @@ func ByteToInt(data []byte) int {
 	for _, b := range data {
 		result = (result << 8) | int(b)
 	}
-	/*for i := len(data) - 1; i >= 0; i-- {
-		count := byte(len(data) - i - 1)
-		result |= int(data[i]) << (count * 8)
-	}*/
 	return result
 }
 
