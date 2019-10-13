@@ -25,6 +25,8 @@ func Read(input io.ReadSeeker) (Metadata, error) {
 		return ReadID3v23(input)
 	case TagVersionID3v24:
 		return ReadID3v24(input)
+	case TagVersionMP4:
+		return ReadMp4(input)
 	default:
 		return nil, ErrorUnsupportedFormat
 	}
@@ -42,6 +44,10 @@ func CheckVersion(input io.ReadSeeker) TagVersion {
 
 	if checkID3v1(input) != TagVersionUndefined {
 		return TagVersionID3v1
+	}
+
+	if checkMp4(input) != TagVersionUndefined {
+		return TagVersionMP4
 	}
 
 	return TagVersionUndefined
