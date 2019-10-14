@@ -412,7 +412,6 @@ func ReadMp4(input io.ReadSeeker) (*MP4, error) {
 		if name == MP4_MOOV_ATOM {
 			parseMoovAtom(bytes, &header)
 		}
-
 	}
 
 	return &header, nil
@@ -442,7 +441,6 @@ func parseMoovAtom(bytes []byte, mp4 *MP4) {
 		if len(bytes) == 0 {
 			break
 		}
-
 	}
 }
 
