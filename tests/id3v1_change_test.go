@@ -10,7 +10,7 @@ import (
 func TestId3v1Change(t *testing.T) {
 	asrt := assert.New(t)
 
-	id3v1, err := tag.ReadFile("tests/id3v1.mp3")
+	id3v1, err := tag.ReadFile("id3v1.mp3")
 	asrt.NoError(err, "open")
 	if err != nil {
 		return
@@ -37,13 +37,13 @@ func TestId3v1Change(t *testing.T) {
 	err = id3v1.SetGenre("Jazz")
 	asrt.NoError(err)
 
-	err = id3v1.SaveFile("tests/id3v1.change.mp3")
+	err = id3v1.SaveFile("id3v1.change.mp3")
 	asrt.NoError(err, "save")
 	if err != nil {
 		return
 	}
 
-	change, err := tag.ReadFile("tests/id3v1.change.mp3")
+	change, err := tag.ReadFile("id3v1.change.mp3")
 	asrt.NoError(err)
 	if err != nil {
 		return
@@ -78,7 +78,7 @@ func TestId3v1Change(t *testing.T) {
 	asrt.Equal(0, trackNumber)
 	asrt.Equal(0, totalTracks)
 
-	err = os.Remove("tests/id3v1.change.mp3")
+	err = os.Remove("id3v1.change.mp3")
 	asrt.NoError(err, "remove")
 	if err != nil {
 		return

@@ -12,22 +12,22 @@ import (
 func TestId3v1Save(t *testing.T) {
 	asrt := assert.New(t)
 
-	id3v1, err := tag.ReadFile("tests/id3v1.mp3")
+	id3v1, err := tag.ReadFile("id3v1.mp3")
 	asrt.NoError(err, "open")
 	if err != nil {
 		return
 	}
 
-	err = id3v1.SaveFile("tests/id3v1.save.mp3")
+	err = id3v1.SaveFile("id3v1.save.mp3")
 	asrt.NoError(err, "save")
 	if err != nil {
 		return
 	}
 
-	cmp := compareFiles("tests/id3v1.mp3", "tests/id3v1.save.mp3")
+	cmp := compareFiles("id3v1.mp3", "id3v1.save.mp3")
 	asrt.True(cmp)
 
-	err = os.Remove("tests/id3v1.save.mp3")
+	err = os.Remove("id3v1.save.mp3")
 	asrt.NoError(err, "remove")
 	if err != nil {
 		return
