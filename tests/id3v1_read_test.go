@@ -9,7 +9,7 @@ import (
 func TestId3v1Read(t *testing.T) {
 	asrt := assert.New(t)
 
-	id3v1, err := tag.ReadFile("tests/id3v1.mp3")
+	id3v1, err := tag.ReadFile("id3v1.mp3")
 	asrt.NoError(err, "open")
 	if err != nil {
 		return

@@ -8,7 +8,7 @@ import (
 
 func TestMp4Read(t *testing.T) {
 	asrt := assert.New(t)
-	mp4, err := tag.ReadFile("tests/cat_walking.mp4")
+	mp4, err := tag.ReadFile("cat_walking.mp4")
 	asrt.NoError(err, "open")
 	if err != nil {
 		return
