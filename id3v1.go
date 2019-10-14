@@ -188,6 +188,9 @@ func (id3v1 *ID3v1) Save(input io.WriteSeeker) error {
 		} else {
 			// for fill track number
 			err = writeString(input, id3v1.Comment, 28)
+			if err != nil {
+				return err
+			}
 			_, err = input.Write([]byte{1, 0})
 			if err != nil {
 				return err
@@ -195,6 +198,9 @@ func (id3v1 *ID3v1) Save(input io.WriteSeeker) error {
 		}
 	} else {
 		err = writeString(input, id3v1.Comment, 28)
+		if err != nil {
+			return err
+		}
 		_, err = input.Write([]byte{0, id3v1.Track})
 		if err != nil {
 			return err
