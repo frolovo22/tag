@@ -5,12 +5,16 @@ import (
 	"encoding/binary"
 	"image"
 	"io"
+	"io/ioutil"
+	"strconv"
 	"strings"
 	"time"
 )
 
 type FLAC struct {
 	Blocks []*FlacMeatadataBlock
+	Tags   map[string]string
+	Data   []byte
 }
 
 func (F *FLAC) GetAllTagNames() []string {
@@ -21,8 +25,8 @@ func (flac *FLAC) GetVersion() TagVersion {
 	return TagVersionFLAC
 }
 
-func (F *FLAC) GetFileData() []byte {
-	panic("implement me")
+func (flac *FLAC) GetFileData() []byte {
+	return flac.Data
 }
 
 func (flac *FLAC) GetTitle() (string, error) {
@@ -37,72 +41,73 @@ func (flac *FLAC) GetAlbum() (string, error) {
 	return flac.GetVorbisComment("ALBUM")
 }
 
-func (F *FLAC) GetYear() (int, error) {
-	panic("implement me")
+func (flac *FLAC) GetYear() (int, error) {
+	return flac.GetVorbisCommentInt("YEAR")
 }
 
-func (F *FLAC) GetComment() (string, error) {
-	panic("implement me")
+func (flac *FLAC) GetComment() (string, error) {
+	return flac.GetVorbisComment("COMMENT")
 }
 
-func (F *FLAC) GetGenre() (string, error) {
-	panic("implement me")
+func (flac *FLAC) GetGenre() (string, error) {
+	return flac.GetVorbisComment("GENRE")
 }
 
 func (flac *FLAC) GetAlbumArtist() (string, error) {
 	return flac.GetVorbisComment("ALBUMARTIST")
 }
 
-func (F *FLAC) GetDate() (time.Time, error) {
+func (flac *FLAC) GetDate() (time.Time, error) {
+	return flac.GetVorbisCommentTime("DATE")
+}
+
+func (flac *FLAC) GetArranger() (string, error) {
+	return flac.GetVorbisComment("ARRANGER")
+}
+
+func (flac *FLAC) GetAuthor() (string, error) {
+	return flac.GetVorbisComment("AUTHOR")
+}
+
+func (flac *FLAC) GetBMP() (int, error) {
+	return flac.GetVorbisCommentInt("BPM")
+}
+
+func (flac *FLAC) GetCatalogNumber() (string, error) {
+	return flac.GetVorbisComment("CATALOGNUMBER")
+}
+
+func (flac *FLAC) GetCompilation() (string, error) {
+	return flac.GetVorbisComment("COMPILATION")
+}
+
+func (flac *FLAC) GetComposer() (string, error) {
+	return flac.GetVorbisComment("COMPOSER")
+}
+
+func (flac *FLAC) GetConductor() (string, error) {
+	return flac.GetVorbisComment("CONDUCTOR")
+}
+
+func (flac *FLAC) GetCopyright() (string, error) {
+	return flac.GetVorbisComment("COPYRIGHT")
+}
+
+func (flac *FLAC) GetDescription() (string, error) {
+	return flac.GetVorbisComment("DESCRIPTION")
+}
+
+func (flac *FLAC) GetDiscNumber() (int, int, error) {
 	panic("implement me")
 }
 
-func (F *FLAC) GetArranger() (string, error) {
-	panic("implement me")
+func (flac *FLAC) GetEncodedBy() (string, error) {
+	return flac.GetVorbisComment("ENCODED-BY")
 }
 
-func (F *FLAC) GetAuthor() (string, error) {
-	panic("implement me")
-}
-
-func (F *FLAC) GetBMP() (int, error) {
-	panic("implement me")
-}
-
-func (F *FLAC) GetCatalogNumber() (string, error) {
-	panic("implement me")
-}
-
-func (F *FLAC) GetCompilation() (string, error) {
-	panic("implement me")
-}
-
-func (F *FLAC) GetComposer() (string, error) {
-	panic("implement me")
-}
-
-func (F *FLAC) GetConductor() (string, error) {
-	panic("implement me")
-}
-
-func (F *FLAC) GetCopyright() (string, error) {
-	panic("implement me")
-}
-
-func (F *FLAC) GetDescription() (string, error) {
-	panic("implement me")
-}
-
-func (F *FLAC) GetDiscNumber() (int, int, error) {
-	panic("implement me")
-}
-
-func (F *FLAC) GetEncodedBy() (string, error) {
-	panic("implement me")
-}
-
-func (F *FLAC) GetTrackNumber() (int, int, error) {
-	panic("implement me")
+func (flac *FLAC) GetTrackNumber() (int, int, error) {
+	//return flac.GetVorbisComment("TRACKNUMBER")
+	return 0, 0, nil
 }
 
 func (F *FLAC) GetPicture() (image.Image, error) {
@@ -358,7 +363,23 @@ func ReadFLAC(input io.ReadSeeker) (*FLAC, error) {
 			break
 		}
 
-		flac.Blocks = append(flac.Blocks, block)
+		if block.Type == FlacVorbisComment {
+			comments, err := readVorbisComments(bytes.NewReader(block.Data))
+			if err != nil {
+				return nil, err
+			}
+			for _, comment := range comments {
+				flac.Tags[comment.Name] = comment.Value
+			}
+		} else {
+			flac.Blocks = append(flac.Blocks, block)
+		}
+	}
+
+	// file data
+	flac.Data, err = ioutil.ReadAll(input)
+	if err != nil {
+		return nil, err
 	}
 
 	return &flac, nil
@@ -404,20 +425,11 @@ type VorbisComment struct {
 }
 
 func (flac *FLAC) GetVorbisComment(key string) (string, error) {
-	for _, block := range flac.Blocks {
-		if block.Type == FlacVorbisComment {
-			comments, err := readVorbisComments(bytes.NewReader(block.Data))
-			if err != nil {
-				return "", err
-			}
-			for _, comment := range comments {
-				if comment.Name == key {
-					return comment.Value, nil
-				}
-			}
-		}
+	val, ok := flac.Tags[key]
+	if !ok {
+		return "", ErrorTagNotFound
 	}
-	return "", ErrorTagNotFound
+	return val, nil
 }
 
 //The comment header is decoded as follows:
@@ -467,6 +479,27 @@ func readVorbisComments(input io.Reader) ([]VorbisComment, error) {
 			Value: vorbis[1],
 		}
 		result = append(result, comment)
+	}
+	return result, nil
+}
+
+func (flac *FLAC) GetVorbisCommentInt(key string) (int, error) {
+	comment, err := flac.GetVorbisComment(key)
+	if err != nil {
+		return 0, err
+	}
+
+	return strconv.Atoi(comment)
+}
+
+func (flac *FLAC) GetVorbisCommentTime(key string) (time.Time, error) {
+	comment, err := flac.GetVorbisComment(key)
+	if err != nil {
+		return time.Now(), err
+	}
+	result, err := time.Parse("2006-01-02T15:04:05", comment)
+	if err != nil {
+		return time.Now(), err
 	}
 	return result, nil
 }
