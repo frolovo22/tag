@@ -8,6 +8,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -633,6 +634,13 @@ func ReadID3v23(input io.ReadSeeker) (*ID3v23, error) {
 	if curRead != length {
 		return nil, errors.New("error extended frames")
 	}
+
+	// file data
+	header.Data, err = ioutil.ReadAll(input)
+	if err != nil {
+		return nil, err
+	}
+
 	return &header, nil
 }
 
