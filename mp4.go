@@ -72,8 +72,8 @@ func (MP4) GetAllTagNames() []string {
 	panic("implement me")
 }
 
-func (MP4) GetVersion() TagVersion {
-	panic("implement me")
+func (mp4 *MP4) GetVersion() TagVersion {
+	return TagVersionMP4
 }
 
 func (MP4) GetFileData() []byte {
@@ -352,14 +352,14 @@ func (MP4) Save(input io.WriteSeeker) error {
 	panic("implement me")
 }
 
-func checkMp4(input io.ReadSeeker) TagVersion {
+func checkMp4(input io.ReadSeeker) bool {
 	if input == nil {
-		return TagVersionUndefined
+		return false
 	}
 
 	data, err := seekAndRead(input, 0, io.SeekStart, 12)
 	if err != nil {
-		return TagVersionUndefined
+		return false
 	}
 	marker := string(data[4:8])
 
@@ -367,12 +367,12 @@ func checkMp4(input io.ReadSeeker) TagVersion {
 		mp4type := string(data[8:12])
 		for _, t := range MP4_TYPES {
 			if mp4type == t {
-				return TagVersionMP4
+				return true
 			}
 		}
 	}
 
-	return TagVersionUndefined
+	return false
 }
 
 func ReadMp4(input io.ReadSeeker) (*MP4, error) {

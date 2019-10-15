@@ -16,6 +16,7 @@ const (
 	TagVersionID3v23    TagVersion = 3
 	TagVersionID3v24    TagVersion = 4
 	TagVersionMP4       TagVersion = 5
+	TagVersionFLAC      TagVersion = 6
 )
 
 var id3VersionMap = map[TagVersion]string{
@@ -24,7 +25,8 @@ var id3VersionMap = map[TagVersion]string{
 	TagVersionID3v22:    "id3v2.2",
 	TagVersionID3v23:    "id3v2.3",
 	TagVersionID3v24:    "id3v2.4",
-	TagVersionMP4:       "MP4",
+	TagVersionMP4:       "mp4",
+	TagVersionFLAC:      "flac",
 }
 
 func (v TagVersion) String() string {

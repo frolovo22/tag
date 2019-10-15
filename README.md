@@ -13,29 +13,29 @@ go get github.com/frolovo22/tag
 
 # Supported tags
 
-| Name              | ID3v1       | ID3v2.2 | ID3v2.3               | ID3v2.4               |
-|-------------------|-------------|---------|-----------------------|-----------------------|
-| Title             | Title       | TT2     | TIT2                  | TIT2                  |
-| Artist            | Artist      | TP1     | TPE1                  | TPE1                  |
-| Album             | Album       | TOT     | TALB                  | TALB                  |
-| Year              | Year        | TYE     | TYER                  | TDOR                  |
-| Comment           | Comment     | COM     | COMM                  | COMM                  |
-| Genre             | Genre       | -       | TCON                  | TCON                  |
-| Album Artist      | -           | TOA     | TPE2                  | TPE2                  | 
-| Date              | -           | TIM     | TYER                  | TDRC                  |
-| Arranger          | -           | -       | IPLS                  | IPLS                  |
-| Author            | -           | TOL     | TOLY                  | TOLY                  |
-| BPM               | -           | BPM     | TBPM                  | TBPM                  |
-| Catalog Number    | -           | -       | TXXX:CATALOGNUMBER    | TXXX:CATALOGNUMBER    |
-| Compilation       | -           | -       | TCMP                  | TCMP                  |
-| Composer          | -           | TCM     | TCOM                  | TCOM                  |
-| Conductor         | -           | TP3     | TPE3                  | TPE3                  |
-| Copyright         | -           | TCR     | TCOP                  | TCOP                  |
-| Description       | -           | TXX     | TIT3                  | TIT3                  |
-| Disc Number       | -           | -       | TPOS                  | TPOS                  |
-| Encoded by        | -           | TEN     | TENC                  | TENC                  |
-| Track Number      | TrackNumber | TRK     | TRCK                  | TRCK                  |  
-| Picture           | -           | PIC     | APIC                  | APIC                  |
+| Name              | ID3v1       | ID3v2.2 | ID3v2.3               | ID3v2.4               | MP4             | FLAC         |
+|-------------------|-------------|---------|-----------------------|-----------------------|-----------------|--------------|
+| Title             | Title       | TT2     | TIT2                  | TIT2                  |                 | TITLE        |       
+| Artist            | Artist      | TP1     | TPE1                  | TPE1                  | ©art            | ARTIST       |
+| Album             | Album       | TOT     | TALB                  | TALB                  | ©nam            | ALBUM        |
+| Year              | Year        | TYE     | TYER                  | TDOR                  |                 |              |
+| Comment           | Comment     | COM     | COMM                  | COMM                  |                 |              |
+| Genre             | Genre       | -       | TCON                  | TCON                  |                 |              |
+| Album Artist      | -           | TOA     | TPE2                  | TPE2                  |                 | ALBUMARTIST  | 
+| Date              | -           | TIM     | TYER                  | TDRC                  |                 |              |
+| Arranger          | -           | -       | IPLS                  | IPLS                  |                 |              |
+| Author            | -           | TOL     | TOLY                  | TOLY                  |                 |              |
+| BPM               | -           | BPM     | TBPM                  | TBPM                  |                 |              |
+| Catalog Number    | -           | -       | TXXX:CATALOGNUMBER    | TXXX:CATALOGNUMBER    |                 |              |
+| Compilation       | -           | -       | TCMP                  | TCMP                  |                 |              |
+| Composer          | -           | TCM     | TCOM                  | TCOM                  |                 |              |
+| Conductor         | -           | TP3     | TPE3                  | TPE3                  |                 |              |
+| Copyright         | -           | TCR     | TCOP                  | TCOP                  |                 |              |
+| Description       | -           | TXX     | TIT3                  | TIT3                  |                 |              |
+| Disc Number       | -           | -       | TPOS                  | TPOS                  |                 |              |
+| Encoded by        | -           | TEN     | TENC                  | TENC                  |                 |              |
+| Track Number      | TrackNumber | TRK     | TRCK                  | TRCK                  |                 |              |  
+| Picture           | -           | PIC     | APIC                  | APIC                  |                 |              |
        
 # Status 
 In progress  
@@ -52,8 +52,8 @@ Future features:
 | idv2.2 | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
 | idv2.3 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 | idv2.4 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
-| mp4    | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
-| FLAC   | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
+| mp4    | <ul><li> - [x] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
+| FLAC   | <ul><li> - [x] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
 
 # How to use
 

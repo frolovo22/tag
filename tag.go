@@ -27,6 +27,8 @@ func Read(input io.ReadSeeker) (Metadata, error) {
 		return ReadID3v24(input)
 	case TagVersionMP4:
 		return ReadMp4(input)
+	case TagVersionFLAC:
+		return ReadFLAC(input)
 	default:
 		return nil, ErrorUnsupportedFormat
 	}
@@ -34,20 +36,24 @@ func Read(input io.ReadSeeker) (Metadata, error) {
 }
 
 func CheckVersion(input io.ReadSeeker) TagVersion {
-	if checkID3v24(input) != TagVersionUndefined {
+	if checkID3v24(input) {
 		return TagVersionID3v24
 	}
 
-	if checkID3v23(input) != TagVersionUndefined {
+	if checkID3v23(input) {
 		return TagVersionID3v23
 	}
 
-	if checkID3v1(input) != TagVersionUndefined {
+	if checkID3v1(input) {
 		return TagVersionID3v1
 	}
 
-	if checkMp4(input) != TagVersionUndefined {
+	if checkMp4(input) {
 		return TagVersionMP4
+	}
+
+	if checkFLAC(input) {
+		return TagVersionFLAC
 	}
 
 	return TagVersionUndefined

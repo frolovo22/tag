@@ -515,29 +515,29 @@ func (id3v2 *ID3v23) String() string {
 	return result
 }
 
-func checkID3v23(input io.ReadSeeker) TagVersion {
+func checkID3v23(input io.ReadSeeker) bool {
 	if input == nil {
-		return TagVersionUndefined
+		return false
 	}
 
 	// read marker (3 bytes) and version (1 byte) for ID3v2
 	data, err := seekAndRead(input, 0, io.SeekStart, 4)
 	if err != nil {
-		return TagVersionUndefined
+		return false
 	}
 	marker := string(data[0:3])
 
 	// id3v2
 	if marker != "ID3" {
-		return TagVersionUndefined
+		return false
 	}
 
 	versionByte := data[3]
 	if versionByte != 3 {
-		return TagVersionUndefined
+		return false
 	}
 
-	return TagVersionID3v23
+	return true
 }
 
 func ReadID3v23(input io.ReadSeeker) (*ID3v23, error) {

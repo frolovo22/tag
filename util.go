@@ -2,6 +2,7 @@ package tag
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"io"
 	"unicode/utf16"
@@ -24,6 +25,24 @@ func seekAndRead(input io.ReadSeeker, offset int64, whence int, read int) ([]byt
 		return nil, err
 	}
 	if nReaded != read {
+		return nil, ErrorReadFile
+	}
+
+	return data, nil
+}
+
+func readBytes(input io.Reader, size int) ([]byte, error) {
+	if input == nil {
+		return nil, ErrorEmptyFile
+	}
+
+	data := make([]byte, size)
+	nReaded, err := input.Read(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if nReaded != size {
 		return nil, ErrorReadFile
 	}
 
@@ -163,6 +182,7 @@ func ByteToInt(data []byte) int {
 
 // Return bit value
 // Index starts from 0
+// bits order [7,6,5,4,3,2,1,0]
 func GetBit(data byte, index byte) byte {
 	return 1 & (data >> index)
 }
@@ -187,4 +207,23 @@ func SetString(value string) []byte {
 	result := []byte{0}
 	// Set data
 	return append(result, []byte(value)...)
+}
+
+// Read format:
+// [length, data]
+// length in littleIndian
+func readLengthData(input io.Reader) ([]byte, error) {
+	// length
+	var length uint32
+	err := binary.Read(input, binary.LittleEndian, &length)
+	if err != nil {
+		return nil, err
+	}
+
+	// data
+	data, err := readBytes(input, int(length))
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
