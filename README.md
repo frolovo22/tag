@@ -3,7 +3,7 @@
 
 # Tag
 
-Its pure golang library
+Its pure golang library for parsing and editing tags in mp3, mp4 and flac formats
 
 # Install
 
@@ -40,8 +40,7 @@ go get github.com/frolovo22/tag
 # Status 
 In progress  
 Future features:
-*  Convert formats
-*  Support all tags (id3 v1, v1.1, v2.2, v2.3, v2.4)
+*  Support all tags (id3 v1, v1.1, v2.2, v2.3, v2.4, mp4, flac)
 *  Fix errors in files (empty tags, incorrect size, tag size, tag parameters)
 *  Command line arguments 
 
@@ -161,7 +160,7 @@ type SaveMetadata interface {
 
 Also you can read defined format. For Example:
 ```go
-file, err := os.Open(path)
+file, err := os.Open("path/to/file")
 if err != nil {
 	return err
 }
@@ -194,6 +193,12 @@ fmt.Println("my tag: " + value)
 
 // Set user tag
 err = id3v2.SetStringTXXX("MYTAG222", "Dogs")
+if err != nil {
+	return err
+}
+
+// Save changes
+err = id3v2.SaveFile("path/to/file")
 if err != nil {
 	return err
 }
