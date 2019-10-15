@@ -45,19 +45,19 @@ func (id3v1 *ID3v1) String() string {
 		trackNumber
 }
 
-func checkID3v1(input io.ReadSeeker) TagVersion {
+func checkID3v1(input io.ReadSeeker) bool {
 	// id3v1
 	data, err := seekAndRead(input, -128, io.SeekEnd, 3)
 	if err != nil {
-		return TagVersionUndefined
+		return false
 	}
 
 	marker := string(data)
 	if marker == "TAG" {
-		return TagVersionID3v1
+		return true
 	}
 
-	return TagVersionUndefined
+	return false
 }
 
 func ReadID3v1(input io.ReadSeeker) (*ID3v1, error) {

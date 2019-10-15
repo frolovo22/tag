@@ -522,29 +522,29 @@ func (id3v2 *ID3v24) String() string {
 	return result
 }
 
-func checkID3v24(input io.ReadSeeker) TagVersion {
+func checkID3v24(input io.ReadSeeker) bool {
 	if input == nil {
-		return TagVersionUndefined
+		return false
 	}
 
 	// read marker (3 bytes) and version (1 byte) for ID3v2
 	data, err := seekAndRead(input, 0, io.SeekStart, 4)
 	if err != nil {
-		return TagVersionUndefined
+		return false
 	}
 	marker := string(data[0:3])
 
 	// id3v2
 	if marker != "ID3" {
-		return TagVersionUndefined
+		return false
 	}
 
 	versionByte := data[3]
 	if versionByte != 4 {
-		return TagVersionUndefined
+		return false
 	}
 
-	return TagVersionID3v24
+	return true
 }
 
 func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
@@ -553,24 +553,10 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 		return nil, ErrorEmptyFile
 	}
 
-	// Seek to file start
-	startIndex, err := input.Seek(0, io.SeekStart)
-	if startIndex != 0 {
-		return nil, ErrorSeekFile
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
 	// Header size
-	headerByte := make([]byte, 10)
-	nReaded, err := input.Read(headerByte)
+	headerByte, err := seekAndRead(input, 0, io.SeekStart, 10)
 	if err != nil {
 		return nil, err
-	}
-	if nReaded != 10 {
-		return nil, errors.New("error header length")
 	}
 
 	// Marker
@@ -602,7 +588,7 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 	curRead := 0
 	for curRead < length {
 		bytesExtendedHeader := make([]byte, 10)
-		nReaded, err = input.Read(bytesExtendedHeader)
+		nReaded, err := input.Read(bytesExtendedHeader)
 		if err != nil {
 			return nil, err
 		}
