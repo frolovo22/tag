@@ -8,6 +8,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -587,14 +588,11 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 	header.Frames = []ID3v24Frame{}
 	curRead := 0
 	for curRead < length {
-		bytesExtendedHeader := make([]byte, 10)
-		nReaded, err := input.Read(bytesExtendedHeader)
+		bytesExtendedHeader, err := readBytes(input, 10)
 		if err != nil {
 			return nil, err
 		}
-		if nReaded != 10 {
-			return nil, errors.New("error extended header length")
-		}
+
 		// Frame identifier
 		key := string(bytesExtendedHeader[0:4])
 
@@ -605,13 +603,9 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 		// Frame data size
 		size := ByteToInt(bytesExtendedHeader[4:8])
 
-		bytesExtendedValue := make([]byte, size)
-		nReaded, err = input.Read(bytesExtendedValue)
+		bytesExtendedValue, err := readBytes(input, size)
 		if err != nil {
 			return nil, err
-		}
-		if nReaded != size {
-			return nil, errors.New("error extended value length")
 		}
 
 		header.Frames = append(header.Frames, ID3v24Frame{
@@ -626,6 +620,13 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 	if curRead != length {
 		return nil, errors.New("error extended frames")
 	}
+
+	// file data
+	header.Data, err = ioutil.ReadAll(input)
+	if err != nil {
+		return nil, err
+	}
+
 	return &header, nil
 }
 

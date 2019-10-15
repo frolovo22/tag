@@ -339,7 +339,9 @@ type FlacMeatadataBlock struct {
 }
 
 func ReadFLAC(input io.ReadSeeker) (*FLAC, error) {
-	flac := FLAC{}
+	flac := FLAC{
+		Tags: map[string]string{},
+	}
 
 	// FLAC identifier
 	data, err := seekAndRead(input, 0, io.SeekStart, 4)
