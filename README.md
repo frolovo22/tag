@@ -15,13 +15,13 @@ go get github.com/frolovo22/tag
 
 | Name              | ID3v1       | ID3v2.2 | ID3v2.3               | ID3v2.4               | MP4             | FLAC                   |
 |-------------------|-------------|---------|-----------------------|-----------------------|-----------------|------------------------|
-| Title             | Title       | TT2     | TIT2                  | TIT2                  |                 | TITLE                  |       
-| Artist            | Artist      | TP1     | TPE1                  | TPE1                  | ©art            | ARTIST                 |
-| Album             | Album       | TOT     | TALB                  | TALB                  | ©nam            | ALBUM                  |
+| Title             | Title       | TT2     | TIT2                  | TIT2                  | \xa9nam         | TITLE                  |       
+| Artist            | Artist      | TP1     | TPE1                  | TPE1                  | \xa9art         | ARTIST                 |
+| Album             | Album       | TOT     | TALB                  | TALB                  | \xa9alb         | ALBUM                  |
 | Year              | Year        | TYE     | TYER                  | TDOR                  |                 | YEAR                   |
 | Comment           | Comment     | COM     | COMM                  | COMM                  |                 | COMMENT                |
 | Genre             | Genre       | -       | TCON                  | TCON                  |                 | GENRE                  |
-| Album Artist      | -           | TOA     | TPE2                  | TPE2                  |                 | ALBUMARTIST            | 
+| Album Artist      | -           | TOA     | TPE2                  | TPE2                  | aART            | ALBUMARTIST            | 
 | Date              | -           | TIM     | TYER                  | TDRC                  |                 | DATE                   |
 | Arranger          | -           | -       | IPLS                  | IPLS                  |                 | ARRANGER               |
 | Author            | -           | TOL     | TOLY                  | TOLY                  |                 | AUTHOR                 |
