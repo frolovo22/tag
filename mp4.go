@@ -15,7 +15,6 @@ const MP4_META_ILST = "ilst"
 
 const MP4_TAG_ALBUM = "album"
 const MP4_TAG_ARTIST = "artist"
-
 const MP4_TAG_ALBUM_ARTIST = "album_artist"
 const MP4_TAG_YEAR = "year"
 const MP4_TAG_TITLE = "title"
@@ -81,23 +80,15 @@ func (MP4) GetFileData() []byte {
 }
 
 func (mp4 *MP4) GetTitle() (string, error) {
-	val, ok := mp4.data[MP4_TAG_TITLE]
-	if !ok {
-		return "", ErrorTagNotFound
-	}
-	return val.(string), nil
+	return mp4.getString(MP4_TAG_TITLE)
 }
 
 func (mp4 *MP4) GetArtist() (string, error) {
-	val, ok := mp4.data[MP4_TAG_ARTIST]
-	if !ok {
-		return "", ErrorTagNotFound
-	}
-	return val.(string), nil
+	return mp4.getString(MP4_TAG_ARTIST)
 }
 
-func (MP4) GetAlbum() (string, error) {
-	panic("implement me")
+func (mp4 *MP4) GetAlbum() (string, error) {
+	return mp4.getString(MP4_TAG_ALBUM)
 }
 
 func (MP4) GetYear() (int, error) {
@@ -112,8 +103,8 @@ func (MP4) GetGenre() (string, error) {
 	panic("implement me")
 }
 
-func (MP4) GetAlbumArtist() (string, error) {
-	panic("implement me")
+func (mp4 *MP4) GetAlbumArtist() (string, error) {
+	return mp4.getString(MP4_TAG_ALBUM_ARTIST)
 }
 
 func (MP4) GetDate() (time.Time, error) {
@@ -350,6 +341,14 @@ func (MP4) SaveFile(path string) error {
 
 func (MP4) Save(input io.WriteSeeker) error {
 	panic("implement me")
+}
+
+func (mp4 *MP4) getString(tag string) (string, error) {
+	val, ok := mp4.data[tag]
+	if !ok {
+		return "", ErrorTagNotFound
+	}
+	return val.(string), nil
 }
 
 func checkMp4(input io.ReadSeeker) bool {
