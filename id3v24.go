@@ -207,6 +207,8 @@ func (id3v2 *ID3v24) GetPicture() (image.Image, error) {
 		return jpeg.Decode(bytes.NewReader(pic.Data))
 	case "image/png":
 		return png.Decode(bytes.NewReader(pic.Data))
+	case "-->":
+		return downloadImage(string(pic.Data))
 	default:
 		return nil, ErrorIncorrectTag
 	}

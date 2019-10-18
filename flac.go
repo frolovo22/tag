@@ -8,7 +8,6 @@ import (
 	"image/png"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -124,16 +123,7 @@ func (flac *FLAC) GetPicture() (image.Image, error) {
 	case "image/png":
 		return png.Decode(bytes.NewReader(pictureBlock.PictureData))
 	case "-->":
-		// image url
-		resp, err := http.Get(string(pictureBlock.PictureData))
-		if err != nil {
-			return nil, err
-		}
-		img, _, err := image.Decode(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-		return img, nil
+		return downloadImage(string(pictureBlock.PictureData))
 	}
 
 	return nil, ErrorIncorrectTag
@@ -542,7 +532,7 @@ type FlacMetadataBlockPicture struct {
 	PictureData    []byte
 }
 
-func (flac *FLAC) GetMetadataBlockPicture() (*FlacMetadataBlockPicture, error){
+func (flac *FLAC) GetMetadataBlockPicture() (*FlacMetadataBlockPicture, error) {
 	for _, block := range flac.Blocks {
 		if block.Type == FlacPicture {
 			return readFlacPicture(bytes.NewReader(block.Data))
