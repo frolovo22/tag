@@ -50,6 +50,7 @@ func TestFLACRead(t *testing.T) {
 			return
 		}
 
-		compareFiles("flac.png", out.Name())
+		cmp := compareFiles("flac.png", out.Name())
+		asrt.Equal(true, cmp)
 	}
 }
