@@ -212,10 +212,10 @@ func SetString(value string) []byte {
 // Read format:
 // [length, data]
 // length in littleIndian
-func readLengthData(input io.Reader) ([]byte, error) {
+func readLengthData(input io.Reader, order binary.ByteOrder) ([]byte, error) {
 	// length
 	var length uint32
-	err := binary.Read(input, binary.LittleEndian, &length)
+	err := binary.Read(input, order, &length)
 	if err != nil {
 		return nil, err
 	}
