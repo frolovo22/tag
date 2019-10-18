@@ -4,8 +4,11 @@ import (
 	"bytes"
 	"encoding/binary"
 	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -110,8 +113,30 @@ func (flac *FLAC) GetTrackNumber() (int, int, error) {
 	return 0, 0, nil
 }
 
-func (F *FLAC) GetPicture() (image.Image, error) {
-	panic("implement me")
+func (flac *FLAC) GetPicture() (image.Image, error) {
+	pictureBlock, err := flac.GetMetadataBlockPicture()
+	if err != nil {
+		return nil, err
+	}
+	switch pictureBlock.MIME {
+	case "image/jpeg":
+		return jpeg.Decode(bytes.NewReader(pictureBlock.PictureData))
+	case "image/png":
+		return png.Decode(bytes.NewReader(pictureBlock.PictureData))
+	case "-->":
+		// image url
+		resp, err := http.Get(string(pictureBlock.PictureData))
+		if err != nil {
+			return nil, err
+		}
+		img, _, err := image.Decode(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		return img, nil
+	}
+
+	return nil, ErrorIncorrectTag
 }
 
 func (F *FLAC) SetTitle(title string) error {
@@ -451,7 +476,7 @@ func readVorbisComments(input io.Reader) ([]VorbisComment, error) {
 	result := []VorbisComment{}
 
 	// vendor
-	_, err := readLengthData(input)
+	_, err := readLengthData(input, binary.LittleEndian)
 	if err != nil {
 		return nil, err
 	}
@@ -465,7 +490,7 @@ func readVorbisComments(input io.Reader) ([]VorbisComment, error) {
 
 	// iterate
 	for i := 0; i < int(length); i++ {
-		data, err := readLengthData(input)
+		data, err := readLengthData(input, binary.LittleEndian)
 		if err != nil {
 			return nil, err
 		}
@@ -504,4 +529,81 @@ func (flac *FLAC) GetVorbisCommentTime(key string) (time.Time, error) {
 		return time.Now(), err
 	}
 	return result, nil
+}
+
+type FlacMetadataBlockPicture struct {
+	Type           int32
+	MIME           string
+	Description    string
+	Width          int32
+	Height         int32
+	BitsPerPixel   int32
+	NumberOfColors int32
+	PictureData    []byte
+}
+
+func (flac *FLAC) GetMetadataBlockPicture() (*FlacMetadataBlockPicture, error){
+	for _, block := range flac.Blocks {
+		if block.Type == FlacPicture {
+			return readFlacPicture(bytes.NewReader(block.Data))
+		}
+	}
+
+	return nil, ErrorTagNotFound
+}
+
+func readFlacPicture(input io.Reader) (*FlacMetadataBlockPicture, error) {
+	var picture FlacMetadataBlockPicture
+
+	// Picture type
+	err := binary.Read(input, binary.BigEndian, &picture.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	// MIME
+	MIMEBytes, err := readLengthData(input, binary.BigEndian)
+	if err != nil {
+		return nil, err
+	}
+	picture.MIME = string(MIMEBytes)
+
+	// Description
+	DescriptionBytes, err := readLengthData(input, binary.BigEndian)
+	if err != nil {
+		return nil, err
+	}
+	picture.Description = string(DescriptionBytes)
+
+	// Width
+	err = binary.Read(input, binary.BigEndian, &picture.Width)
+	if err != nil {
+		return nil, err
+	}
+
+	// Height
+	err = binary.Read(input, binary.BigEndian, &picture.Height)
+	if err != nil {
+		return nil, err
+	}
+
+	// Bits per pixel
+	err = binary.Read(input, binary.BigEndian, &picture.BitsPerPixel)
+	if err != nil {
+		return nil, err
+	}
+
+	// Number of colors
+	err = binary.Read(input, binary.BigEndian, &picture.NumberOfColors)
+	if err != nil {
+		return nil, err
+	}
+
+	// Picture data
+	picture.PictureData, err = readLengthData(input, binary.BigEndian)
+	if err != nil {
+		return nil, err
+	}
+
+	return &picture, nil
 }
