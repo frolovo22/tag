@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"image"
 	"io"
+	"net/http"
 	"unicode/utf16"
 	"unicode/utf8"
 )
@@ -226,4 +228,13 @@ func readLengthData(input io.Reader, order binary.ByteOrder) ([]byte, error) {
 		return nil, err
 	}
 	return data, nil
+}
+
+func downloadImage(url string) (image.Image, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	img, _, err := image.Decode(resp.Body)
+	return img, err
 }
