@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"image"
 	"io"
+	"strconv"
 	"time"
 )
 
@@ -30,7 +31,7 @@ const MP4_TAG_LYRICS = "lyrics"
 const MP4_TAG_COMMENT = "comment"
 const MP4_TAG_TEMPO = "tempo"
 const MP4_TAG_COMPILATION = "compilation"
-const MP4_TAG_DISC = "disc"
+const MP4_TAG_DISC = "disk"
 
 var MP4_TYPES = [...]string{
 	"mp41",
@@ -91,16 +92,20 @@ func (mp4 *MP4) GetAlbum() (string, error) {
 	return mp4.getString(MP4_TAG_ALBUM)
 }
 
-func (MP4) GetYear() (int, error) {
-	panic("implement me")
+func (mp4 *MP4) GetYear() (int, error) {
+	year, err := mp4.getString(MP4_TAG_YEAR)
+	if err != nil {
+		return 0, err
+	}
+	return strconv.Atoi(year)
 }
 
 func (MP4) GetComment() (string, error) {
 	panic("implement me")
 }
 
-func (MP4) GetGenre() (string, error) {
-	panic("implement me")
+func (mp4 *MP4) GetGenre() (string, error) {
+	return mp4.getString(MP4_TAG_GENRE)
 }
 
 func (mp4 *MP4) GetAlbumArtist() (string, error) {
@@ -131,8 +136,8 @@ func (MP4) GetCompilation() (string, error) {
 	panic("implement me")
 }
 
-func (MP4) GetComposer() (string, error) {
-	panic("implement me")
+func (mp4 *MP4) GetComposer() (string, error) {
+	return mp4.getString(MP4_TAG_COMPOSER)
 }
 
 func (MP4) GetConductor() (string, error) {
@@ -155,8 +160,16 @@ func (MP4) GetEncodedBy() (string, error) {
 	panic("implement me")
 }
 
-func (MP4) GetTrackNumber() (int, int, error) {
-	panic("implement me")
+func (mp4 *MP4) GetTrackNumber() (int, int, error) {
+	track, err := mp4.getInt(MP4_TAG_TRACK)
+	if err != nil {
+		return 0, 0, err
+	}
+	total, err2 := mp4.getInt(MP4_TAG_TRACK + "_TOTAL")
+	if err2 != nil {
+		return 0, 0, err2
+	}
+	return track, total, nil
 }
 
 func (MP4) GetPicture() (image.Image, error) {
@@ -351,6 +364,14 @@ func (mp4 *MP4) getString(tag string) (string, error) {
 	return val.(string), nil
 }
 
+func (mp4 *MP4) getInt(tag string) (int, error) {
+	val, ok := mp4.data[tag]
+	if !ok {
+		return 0, ErrorTagNotFound
+	}
+	return val.(int), nil
+}
+
 func checkMp4(input io.ReadSeeker) bool {
 	if input == nil {
 		return false
@@ -447,4 +468,13 @@ func parseAtomData(bytes []byte, atomName string, mp4 *MP4) {
 	// TODO : different types
 	value := string(bytes[16:])
 	mp4.data[atomName] = value
+	//println(atomName)
+
+	// type
+	//println(binary.BigEndian.Uint32(bytes[8:12]))
+
+	if atomName == MP4_TAG_TRACK || atomName == MP4_TAG_DISC {
+		mp4.data[atomName] = int(bytes[19:20][0])
+		mp4.data[atomName+"_TOTAL"] = int(bytes[21:22][0])
+	}
 }
