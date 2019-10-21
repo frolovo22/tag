@@ -37,7 +37,7 @@ func TestFLACRead(t *testing.T) {
 	picture, err := flac.GetPicture()
 	asrt.NoError(err)
 	if err == nil {
-		out, err := ioutil.TempFile("","flacTst.png")
+		out, err := ioutil.TempFile("", "flacTst.png")
 		if err != nil {
 			asrt.NoError(err)
 			return
