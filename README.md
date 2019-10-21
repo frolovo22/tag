@@ -11,6 +11,13 @@ Its pure golang library for parsing and editing tags in mp3, mp4 and flac format
 go get github.com/frolovo22/tag
 ```
 
+For using command line arguments
+```go 
+go get github.com/frolovo22/tag
+cd tag
+go install
+```
+
 # Supported tags
 
 | Name              | ID3v1       | ID3v2.2 | ID3v2.3               | ID3v2.4               | MP4             | FLAC                   |
@@ -53,6 +60,35 @@ Future features:
 | idv2.4 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 | mp4    | <ul><li> - [x] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
 | FLAC   | <ul><li> - [x] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
+
+# Command line arguments
+
+Cli info
+```bash
+tag help
+```
+
+For read tags use
+```bash
+tag read -in "path/to/file"
+# example output
+version: id3v2.4
+description         : subtitle
+track number        : 12/12
+author              : Kitten
+catalog number      : catalogcat
+bmp                 : 777
+conductor           : catconductor
+copyright           : 2019
+album               : CatAlbum
+comment             : catcomment
+```
+
+for save meta information use
+```bash
+tag read -in "path/to/file" -out "path/to/outputfile.json"
+```
+Now supported only json output file
 
 # How to use
 
