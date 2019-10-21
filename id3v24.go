@@ -574,6 +574,7 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 	if versionByte != 4 {
 		return nil, ErrorUnsupportedFormat
 	}
+	header.Version = TagVersionID3v24
 
 	// Sub version
 	subVersionByte := headerByte[4]
