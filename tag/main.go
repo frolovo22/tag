@@ -37,6 +37,7 @@ func main() {
 					return err
 				}
 				tags := tag.GetMap(metadata)
+				fmt.Println(fmt.Sprintf("%s: %v", "version", metadata.GetVersion()))
 				for key, val := range tags {
 					fmt.Println(fmt.Sprintf("%-20s: %v", key, val))
 				}

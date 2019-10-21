@@ -21,8 +21,6 @@ func GetMap(metadata Metadata) map[string]interface{} {
 	var val interface{}
 	var err error
 
-	tags["version"] = metadata.GetVersion().String()
-
 	if val, err = metadata.GetTitle(); err == nil {
 		tags["title"] = val
 	}
