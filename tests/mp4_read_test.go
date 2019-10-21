@@ -29,4 +29,21 @@ func TestMp4Read(t *testing.T) {
 	albumArtist, err := mp4.GetAlbumArtist()
 	asrt.NoError(err)
 	asrt.Equal("Album Artist Cat", albumArtist)
+
+	year, err := mp4.GetYear()
+	asrt.NoError(err)
+	asrt.Equal(2019, year)
+
+	genre, err := mp4.GetGenre()
+	asrt.NoError(err)
+	asrt.Equal("New Wave", genre)
+
+	track, totalNumber, err := mp4.GetTrackNumber()
+	asrt.NoError(err)
+	asrt.Equal(10, track)
+	asrt.Equal(0, totalNumber)
+
+	composer, err := mp4.GetComposer()
+	asrt.NoError(err)
+	asrt.Equal("Composercat", composer)
 }
