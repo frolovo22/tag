@@ -1,8 +1,11 @@
 package tag
 
 import (
+	"bytes"
 	"encoding/binary"
 	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"strconv"
 	"time"
@@ -144,8 +147,8 @@ func (MP4) GetConductor() (string, error) {
 	panic("implement me")
 }
 
-func (MP4) GetCopyright() (string, error) {
-	panic("implement me")
+func (mp4 *MP4) GetCopyright() (string, error) {
+	return mp4.getString(MP4_TAG_COPYRIGHT)
 }
 
 func (MP4) GetDescription() (string, error) {
@@ -156,8 +159,8 @@ func (MP4) GetDiscNumber() (int, int, error) {
 	panic("implement me")
 }
 
-func (MP4) GetEncodedBy() (string, error) {
-	panic("implement me")
+func (mp4 *MP4) GetEncodedBy() (string, error) {
+	return mp4.getString(MP4_TAG_ENCODER)
 }
 
 func (mp4 *MP4) GetTrackNumber() (int, int, error) {
@@ -172,8 +175,20 @@ func (mp4 *MP4) GetTrackNumber() (int, int, error) {
 	return track, total, nil
 }
 
-func (MP4) GetPicture() (image.Image, error) {
-	panic("implement me")
+func (mp4 *MP4) GetPicture() (image.Image, error) {
+	pictureBlock, ok := mp4.data[MP4_TAG_PICTURE]
+	if !ok {
+		return nil, ErrorTagNotFound
+	}
+	picture := pictureBlock.(AttachedPicture)
+	switch picture.MIME {
+	case "image/jpeg":
+		return jpeg.Decode(bytes.NewReader(picture.Data))
+	case "image/png":
+		return png.Decode(bytes.NewReader(picture.Data))
+	}
+
+	return nil, ErrorIncorrectTag
 }
 
 func (MP4) SetTitle(title string) error {
@@ -470,8 +485,14 @@ func parseAtomData(bytes []byte, atomName string, mp4 *MP4) {
 	mp4.data[atomName] = value
 	//println(atomName)
 
-	// type
-	//println(binary.BigEndian.Uint32(bytes[8:12]))
+	datatype := binary.BigEndian.Uint32(bytes[8:12])
+	if datatype == 13 {
+		mp4.data[atomName] = AttachedPicture{
+			MIME: "image/jpeg",
+			Data: bytes[16:],
+		}
+
+	}
 
 	if atomName == MP4_TAG_TRACK || atomName == MP4_TAG_DISC {
 		mp4.data[atomName] = int(bytes[19:20][0])
