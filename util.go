@@ -230,6 +230,20 @@ func readLengthData(input io.Reader, order binary.ByteOrder) ([]byte, error) {
 	return data, nil
 }
 
+func writeLengthData(output io.Writer, order binary.ByteOrder, data []byte) error {
+	length := len(data)
+	err := binary.Write(output, order, length)
+	if err != nil {
+		return err
+	}
+
+	_, err = output.Write(data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func downloadImage(url string) (image.Image, error) {
 	resp, err := http.Get(url)
 	if err != nil {

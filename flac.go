@@ -536,6 +536,10 @@ func (flac *FLAC) GetVorbisCommentTime(key string) (time.Time, error) {
 	return result, nil
 }
 
+func writeVorbisComment(output io.Writer, value []VorbisComment) error {
+	return nil
+}
+
 type FlacMetadataBlockPicture struct {
 	Type           int32
 	MIME           string
