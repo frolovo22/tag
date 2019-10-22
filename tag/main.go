@@ -14,6 +14,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "tag"
 	app.Usage = "mp3, mp4, flac tags reader/writer"
+	app.Version = "0.0.1"
 
 	app.Commands = cli.Commands{
 		cli.Command{
