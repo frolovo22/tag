@@ -3,6 +3,9 @@ package tests
 import (
 	"github.com/frolovo22/tag"
 	"github.com/stretchr/testify/assert"
+	"image/jpeg"
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -46,4 +49,34 @@ func TestMp4Read(t *testing.T) {
 	composer, err := mp4.GetComposer()
 	asrt.NoError(err)
 	asrt.Equal("Composercat", composer)
+
+	encoder, err := mp4.GetEncodedBy()
+	asrt.NoError(err)
+	asrt.Equal("Lavf58.29.100", encoder)
+
+	copyright, err := mp4.GetCopyright()
+	asrt.NoError(err)
+	asrt.Equal("Cat", copyright)
+
+	picture, err := mp4.GetPicture()
+	asrt.NoError(err)
+	if err == nil {
+		out, err := ioutil.TempFile("", "mp4_test.jpg")
+		if err != nil {
+			asrt.NoError(err)
+			return
+		}
+		defer os.Remove(out.Name())
+
+		err = jpeg.Encode(out, picture, &jpeg.Options{
+			Quality: 95,
+		})
+		if err != nil {
+			asrt.NoError(err)
+			return
+		}
+
+		cmp := compareFiles("cat_walking_cover.jpg", out.Name())
+		asrt.Equal(true, cmp)
+	}
 }
