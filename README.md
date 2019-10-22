@@ -13,9 +13,7 @@ go get github.com/frolovo22/tag
 
 For using command line arguments
 ```go 
-go get github.com/frolovo22/tag
-cd tag
-go install
+go install github.com/frolovo22/tag
 ```
 
 # Supported tags
