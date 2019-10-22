@@ -1,20 +1,8 @@
 package tag
 
 import (
-	"encoding/json"
-	"encoding/xml"
 	"fmt"
 )
-
-func GetJSON(metadata Metadata) ([]byte, error) {
-	tags := GetMap(metadata)
-	return json.Marshal(tags)
-}
-
-func GetXML(metadata Metadata) ([]byte, error) {
-	tags := GetMap(metadata)
-	return xml.Marshal(tags)
-}
 
 func GetMap(metadata Metadata) map[string]interface{} {
 	var tags = map[string]interface{}{}

@@ -100,7 +100,15 @@ func (flac *FLAC) GetDescription() (string, error) {
 }
 
 func (flac *FLAC) GetDiscNumber() (int, int, error) {
-	panic("implement me")
+	number, err := flac.GetVorbisCommentInt("DISCNUMBER")
+	if err != nil {
+		return 0, 0, err
+	}
+	total, err := flac.GetVorbisCommentInt("DISCTOTAL")
+	if err != nil {
+		return 0, 0, err
+	}
+	return number, total, nil
 }
 
 func (flac *FLAC) GetEncodedBy() (string, error) {
@@ -108,8 +116,15 @@ func (flac *FLAC) GetEncodedBy() (string, error) {
 }
 
 func (flac *FLAC) GetTrackNumber() (int, int, error) {
-	//return flac.GetVorbisComment("TRACKNUMBER")
-	return 0, 0, nil
+	number, err := flac.GetVorbisCommentInt("TRACKNUMBER")
+	if err != nil {
+		return 0, 0, err
+	}
+	total, err := flac.GetVorbisCommentInt("TRACKTOTAL")
+	if err != nil {
+		return 0, 0, err
+	}
+	return number, total, nil
 }
 
 func (flac *FLAC) GetPicture() (image.Image, error) {
