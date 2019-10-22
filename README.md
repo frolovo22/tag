@@ -23,9 +23,9 @@ go install github.com/frolovo22/tag
 | Title             | Title       | TT2     | TIT2                  | TIT2                  | \xa9nam         | TITLE                  |       
 | Artist            | Artist      | TP1     | TPE1                  | TPE1                  | \xa9art         | ARTIST                 |
 | Album             | Album       | TOT     | TALB                  | TALB                  | \xa9alb         | ALBUM                  |
-| Year              | Year        | TYE     | TYER                  | TDOR                  |                 | YEAR                   |
+| Year              | Year        | TYE     | TYER                  | TDOR                  | \xa9day         | YEAR                   |
 | Comment           | Comment     | COM     | COMM                  | COMM                  |                 | COMMENT                |
-| Genre             | Genre       | -       | TCON                  | TCON                  |                 | GENRE                  |
+| Genre             | Genre       | -       | TCON                  | TCON                  | \xa9gen         | GENRE                  |
 | Album Artist      | -           | TOA     | TPE2                  | TPE2                  | aART            | ALBUMARTIST            | 
 | Date              | -           | TIM     | TYER                  | TDRC                  |                 | DATE                   |
 | Arranger          | -           | -       | IPLS                  | IPLS                  |                 | ARRANGER               |
@@ -33,14 +33,14 @@ go install github.com/frolovo22/tag
 | BPM               | -           | BPM     | TBPM                  | TBPM                  |                 | BPM                    |
 | Catalog Number    | -           | -       | TXXX:CATALOGNUMBER    | TXXX:CATALOGNUMBER    |                 | CATALOGNUMBER          |
 | Compilation       | -           | -       | TCMP                  | TCMP                  |                 | COMPILATION            |
-| Composer          | -           | TCM     | TCOM                  | TCOM                  |                 | COMPOSER               |
+| Composer          | -           | TCM     | TCOM                  | TCOM                  | \xa9wrt         | COMPOSER               |
 | Conductor         | -           | TP3     | TPE3                  | TPE3                  |                 | CONDUCTOR              |
-| Copyright         | -           | TCR     | TCOP                  | TCOP                  |                 | COPYRIGHT              |
+| Copyright         | -           | TCR     | TCOP                  | TCOP                  | cprt            | COPYRIGHT              |
 | Description       | -           | TXX     | TIT3                  | TIT3                  |                 | DESCRIPTION            |
 | Disc Number       | -           | -       | TPOS                  | TPOS                  |                 | DISCNUMBER             |
-| Encoded by        | -           | TEN     | TENC                  | TENC                  |                 | ENCODED-BY             |
-| Track Number      | TrackNumber | TRK     | TRCK                  | TRCK                  |                 | TRACKNUMBER            |  
-| Picture           | -           | PIC     | APIC                  | APIC                  |                 | METADATA_BLOCK_PICTURE |
+| Encoded by        | -           | TEN     | TENC                  | TENC                  | \xa9too         | ENCODED-BY             |
+| Track Number      | TrackNumber | TRK     | TRCK                  | TRCK                  | trkn            | TRACKNUMBER            |  
+| Picture           | -           | PIC     | APIC                  | APIC                  | covr            | METADATA_BLOCK_PICTURE |
        
 # Status 
 In progress  
