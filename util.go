@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"image"
+	"image/color"
 	"io"
 	"net/http"
 	"unicode/utf16"
@@ -251,4 +252,29 @@ func downloadImage(url string) (image.Image, error) {
 	}
 	img, _, err := image.Decode(resp.Body)
 	return img, err
+}
+
+func colorModelToBitsPerPixel(model color.Model) int {
+	var bpp int
+	switch model {
+	case color.RGBAModel:
+		bpp = 8
+	case color.RGBA64Model:
+		bpp = 64
+	case color.NRGBAModel:
+		bpp = 8
+	case color.NRGBA64Model:
+		bpp = 64
+	case color.AlphaModel:
+		bpp = 8
+	case color.Alpha16Model:
+		bpp = 16
+	case color.GrayModel:
+		bpp = 8
+	case color.Gray16Model:
+		bpp = 16
+	default:
+		bpp = 8
+	}
+	return bpp
 }
