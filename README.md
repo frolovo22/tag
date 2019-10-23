@@ -57,7 +57,7 @@ Future features:
 | idv2.3 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 | idv2.4 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 | mp4    | <ul><li> - [x] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
-| FLAC   | <ul><li> - [x] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
+| FLAC   | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [ ] </li></ul> |
 
 # Command line arguments
 
