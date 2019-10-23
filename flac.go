@@ -391,6 +391,7 @@ func (flac *FLAC) DeletePicture() error {
 	if index != -1 {
 		flac.Blocks = append(flac.Blocks[:index], flac.Blocks[index+1:]...)
 	}
+	return nil
 }
 
 func (flac *FLAC) SaveFile(path string) error {
