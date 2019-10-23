@@ -15,8 +15,12 @@ import (
 
 type FLAC struct {
 	Blocks []*FlacMeatadataBlock
+
+	// Vorbis Comment
+	Vendor string
 	Tags   map[string]string
-	Data   []byte
+
+	Data []byte
 }
 
 func (F *FLAC) GetAllTagNames() []string {
@@ -144,184 +148,257 @@ func (flac *FLAC) GetPicture() (image.Image, error) {
 	return nil, ErrorIncorrectTag
 }
 
-func (F *FLAC) SetTitle(title string) error {
-	panic("implement me")
+func (flac *FLAC) SetTitle(title string) error {
+	flac.Tags["TITLE"] = title
+	return nil
 }
 
-func (F *FLAC) SetArtist(artist string) error {
-	panic("implement me")
+func (flac *FLAC) SetArtist(artist string) error {
+	flac.Tags["ARTIST"] = artist
+	return nil
 }
 
-func (F *FLAC) SetAlbum(album string) error {
-	panic("implement me")
+func (flac *FLAC) SetAlbum(album string) error {
+	flac.Tags["ALBUM"] = album
+	return nil
 }
 
-func (F *FLAC) SetYear(year int) error {
-	panic("implement me")
+func (flac *FLAC) SetYear(year int) error {
+	flac.Tags["YEAR"] = strconv.Itoa(year)
+	return nil
 }
 
-func (F *FLAC) SetComment(comment string) error {
-	panic("implement me")
+func (flac *FLAC) SetComment(comment string) error {
+	flac.Tags["COMMENT"] = comment
+	return nil
 }
 
-func (F *FLAC) SetGenre(genre string) error {
-	panic("implement me")
+func (flac *FLAC) SetGenre(genre string) error {
+	flac.Tags["GENRE"] = genre
+	return nil
 }
 
-func (F *FLAC) SetAlbumArtist(albumArtist string) error {
-	panic("implement me")
+func (flac *FLAC) SetAlbumArtist(albumArtist string) error {
+	flac.Tags["ALBUMARTIST"] = albumArtist
+	return nil
 }
 
-func (F *FLAC) SetDate(date time.Time) error {
-	panic("implement me")
+func (flac *FLAC) SetDate(date time.Time) error {
+	flac.Tags["DATE"] = date.Format("2006-01-02T15:04:05")
+	return nil
 }
 
-func (F *FLAC) SetArranger(arranger string) error {
-	panic("implement me")
+func (flac *FLAC) SetArranger(arranger string) error {
+	flac.Tags["ARRANGER"] = arranger
+	return nil
 }
 
-func (F *FLAC) SetAuthor(author string) error {
-	panic("implement me")
+func (flac *FLAC) SetAuthor(author string) error {
+	flac.Tags["AUTHOR"] = author
+	return nil
 }
 
-func (F *FLAC) SetBMP(bmp int) error {
-	panic("implement me")
+func (flac *FLAC) SetBMP(bmp int) error {
+	flac.Tags["BMP"] = strconv.Itoa(bmp)
+	return nil
 }
 
-func (F *FLAC) SetCatalogNumber(catalogNumber string) error {
-	panic("implement me")
+func (flac *FLAC) SetCatalogNumber(catalogNumber string) error {
+	flac.Tags["CATALOGNUMBER"] = catalogNumber
+	return nil
 }
 
-func (F *FLAC) SetCompilation(compilation string) error {
-	panic("implement me")
+func (flac *FLAC) SetCompilation(compilation string) error {
+	flac.Tags["COMPILATION"] = compilation
+	return nil
 }
 
-func (F *FLAC) SetComposer(composer string) error {
-	panic("implement me")
+func (flac *FLAC) SetComposer(composer string) error {
+	flac.Tags["COMPOSER"] = composer
+	return nil
 }
 
-func (F *FLAC) SetConductor(conductor string) error {
-	panic("implement me")
+func (flac *FLAC) SetConductor(conductor string) error {
+	flac.Tags["CONDUCTOR"] = conductor
+	return nil
 }
 
-func (F *FLAC) SetCopyright(copyright string) error {
-	panic("implement me")
+func (flac *FLAC) SetCopyright(copyright string) error {
+	flac.Tags["COPYRIGHT"] = copyright
+	return nil
 }
 
-func (F *FLAC) SetDescription(description string) error {
-	panic("implement me")
+func (flac *FLAC) SetDescription(description string) error {
+	flac.Tags["DESCRIPTION"] = description
+	return nil
 }
 
-func (F *FLAC) SetDiscNumber(number int, total int) error {
-	panic("implement me")
+func (flac *FLAC) SetDiscNumber(number int, total int) error {
+	flac.Tags["DISCNUMBER"] = strconv.Itoa(number)
+	flac.Tags["DISCTOTAL"] = strconv.Itoa(total)
+	return nil
 }
 
-func (F *FLAC) SetEncodedBy(encodedBy string) error {
-	panic("implement me")
+func (flac *FLAC) SetEncodedBy(encodedBy string) error {
+	flac.Tags["ENCODED-BY"] = encodedBy
+	return nil
 }
 
-func (F *FLAC) SetTrackNumber(number int, total int) error {
-	panic("implement me")
+func (flac *FLAC) SetTrackNumber(number int, total int) error {
+	flac.Tags["TRACKNUMBER"] = strconv.Itoa(number)
+	flac.Tags["TRACKTOTAL"] = strconv.Itoa(total)
+	return nil
 }
 
-func (F *FLAC) SetPicture(picture image.Image) error {
-	panic("implement me")
+func (flac *FLAC) SetPicture(picture image.Image) error {
+	//bitsPerPixel := colorModelToBitsPerPixel(picture.ColorModel())
+	//pictureBlock := FlacMetadataBlockPicture{
+	//	Type:           3, // Other type
+	//	MIME:           "image/png",
+	//	Description:    "",
+	//	Width:          int32(picture.Bounds().Size().X),
+	//	Height:         int32(picture.Bounds().Size().Y),
+	//	BitsPerPixel:   int32(bitsPerPixel),
+	//	NumberOfColors: 0,
+	//	PictureData:    nil,
+	//}
+	var size int
+	var data []byte
+
+	for _, val := range flac.Blocks {
+		if val.Type == FlacPicture {
+			val.Size = size
+			val.Data = data
+		}
+	}
+	return nil
 }
 
-func (F *FLAC) DeleteAll() error {
-	panic("implement me")
+func (flac *FLAC) DeleteAll() error {
+	flac.Tags = map[string]string{}
+	return nil
 }
 
-func (F *FLAC) DeleteTitle() error {
-	panic("implement me")
+func (flac *FLAC) DeleteTitle() error {
+	delete(flac.Tags, "TITLE")
+	return nil
 }
 
-func (F *FLAC) DeleteArtist() error {
-	panic("implement me")
+func (flac *FLAC) DeleteArtist() error {
+	delete(flac.Tags, "ARTIST")
+	return nil
 }
 
-func (F *FLAC) DeleteAlbum() error {
-	panic("implement me")
+func (flac *FLAC) DeleteAlbum() error {
+	delete(flac.Tags, "ALBUM")
+	return nil
 }
 
-func (F *FLAC) DeleteYear() error {
-	panic("implement me")
+func (flac *FLAC) DeleteYear() error {
+	delete(flac.Tags, "YEAR")
+	return nil
 }
 
-func (F *FLAC) DeleteComment() error {
-	panic("implement me")
+func (flac *FLAC) DeleteComment() error {
+	delete(flac.Tags, "COMMENT")
+	return nil
 }
 
-func (F *FLAC) DeleteGenre() error {
-	panic("implement me")
+func (flac *FLAC) DeleteGenre() error {
+	delete(flac.Tags, "GENRE")
+	return nil
 }
 
-func (F *FLAC) DeleteAlbumArtist() error {
-	panic("implement me")
+func (flac *FLAC) DeleteAlbumArtist() error {
+	delete(flac.Tags, "ALBUMARTIST")
+	return nil
 }
 
-func (F *FLAC) DeleteDate() error {
-	panic("implement me")
+func (flac *FLAC) DeleteDate() error {
+	delete(flac.Tags, "DATE")
+	return nil
 }
 
-func (F *FLAC) DeleteArranger() error {
-	panic("implement me")
+func (flac *FLAC) DeleteArranger() error {
+	delete(flac.Tags, "ARRANGER")
+	return nil
 }
 
-func (F *FLAC) DeleteAuthor() error {
-	panic("implement me")
+func (flac *FLAC) DeleteAuthor() error {
+	delete(flac.Tags, "AUTHOR")
+	return nil
 }
 
-func (F *FLAC) DeleteBMP() error {
-	panic("implement me")
+func (flac *FLAC) DeleteBMP() error {
+	delete(flac.Tags, "BPM")
+	return nil
 }
 
-func (F *FLAC) DeleteCatalogNumber() error {
-	panic("implement me")
+func (flac *FLAC) DeleteCatalogNumber() error {
+	delete(flac.Tags, "CATALOGNUMBER")
+	return nil
 }
 
-func (F *FLAC) DeleteCompilation() error {
-	panic("implement me")
+func (flac *FLAC) DeleteCompilation() error {
+	delete(flac.Tags, "COMPILATION")
+	return nil
 }
 
-func (F *FLAC) DeleteComposer() error {
-	panic("implement me")
+func (flac *FLAC) DeleteComposer() error {
+	delete(flac.Tags, "COMPOSER")
+	return nil
 }
 
-func (F *FLAC) DeleteConductor() error {
-	panic("implement me")
+func (flac *FLAC) DeleteConductor() error {
+	delete(flac.Tags, "CONDUCTOR")
+	return nil
 }
 
-func (F *FLAC) DeleteCopyright() error {
-	panic("implement me")
+func (flac *FLAC) DeleteCopyright() error {
+	delete(flac.Tags, "COPYRIGHT")
+	return nil
 }
 
-func (F *FLAC) DeleteDescription() error {
-	panic("implement me")
+func (flac *FLAC) DeleteDescription() error {
+	delete(flac.Tags, "DESCRIPTION")
+	return nil
 }
 
-func (F *FLAC) DeleteDiscNumber() error {
-	panic("implement me")
+func (flac *FLAC) DeleteDiscNumber() error {
+	delete(flac.Tags, "DISCNUMBER")
+	delete(flac.Tags, "DISCTOTAL")
+	return nil
 }
 
-func (F *FLAC) DeleteEncodedBy() error {
-	panic("implement me")
+func (flac *FLAC) DeleteEncodedBy() error {
+	delete(flac.Tags, "ENCODED-BY")
+	return nil
 }
 
-func (F *FLAC) DeleteTrackNumber() error {
-	panic("implement me")
+func (flac *FLAC) DeleteTrackNumber() error {
+	delete(flac.Tags, "TRACKNUMBER")
+	delete(flac.Tags, "TRACKTOTAL")
+	return nil
 }
 
-func (F *FLAC) DeletePicture() error {
-	panic("implement me")
+func (flac *FLAC) DeletePicture() error {
+	index := -1
+	for i, val := range flac.Blocks {
+		if val.Type == FlacPicture {
+			index = i
+		}
+	}
+	if index != -1 {
+		flac.Blocks = append(flac.Blocks[:index], flac.Blocks[index+1:]...)
+	}
 }
 
-func (F *FLAC) SaveFile(path string) error {
-	panic("implement me")
+func (flac *FLAC) SaveFile(path string) error {
+	return nil
 }
 
-func (F *FLAC) Save(input io.WriteSeeker) error {
-	panic("implement me")
+func (flac *FLAC) Save(input io.WriteSeeker) error {
+	return nil
 }
 
 func checkFLAC(input io.ReadSeeker) bool {
@@ -396,10 +473,11 @@ func ReadFLAC(input io.ReadSeeker) (*FLAC, error) {
 		}
 
 		if block.Type == FlacVorbisComment {
-			comments, err := readVorbisComments(bytes.NewReader(block.Data))
+			comments, vendor, err := readVorbisComments(bytes.NewReader(block.Data))
 			if err != nil {
 				return nil, err
 			}
+			flac.Vendor = vendor
 			for _, comment := range comments {
 				flac.Tags[comment.Name] = comment.Value
 			}
@@ -477,33 +555,33 @@ func (flac *FLAC) GetVorbisComment(key string) (string, error) {
 //	}
 //
 //	7) [framing_bit] = read a single bit as boolean
-func readVorbisComments(input io.Reader) ([]VorbisComment, error) {
+func readVorbisComments(input io.Reader) ([]VorbisComment, string, error) {
 	result := []VorbisComment{}
 
 	// vendor
-	_, err := readLengthData(input, binary.LittleEndian)
+	vendorByte, err := readLengthData(input, binary.LittleEndian)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// user_comment_list_length
 	var length uint32
 	err = binary.Read(input, binary.LittleEndian, &length)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// iterate
 	for i := 0; i < int(length); i++ {
 		data, err := readLengthData(input, binary.LittleEndian)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 
 		// Parse data
 		vorbis := strings.SplitN(string(data), "=", 2)
 		if len(vorbis) != 2 {
-			return nil, ErrorIncorrectTag
+			return nil, "", ErrorIncorrectTag
 		}
 
 		comment := VorbisComment{
@@ -512,7 +590,7 @@ func readVorbisComments(input io.Reader) ([]VorbisComment, error) {
 		}
 		result = append(result, comment)
 	}
-	return result, nil
+	return result, string(vendorByte), nil
 }
 
 func (flac *FLAC) GetVorbisCommentInt(key string) (int, error) {
