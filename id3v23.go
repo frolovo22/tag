@@ -451,11 +451,11 @@ func (id3v2 *ID3v23) writeHeaderId3v23(writer io.Writer) error {
 	lengthByte := IntToByteSynchsafe(length)
 	copy(headerByte[6:10], lengthByte)
 
-	nWriten, err := writer.Write(headerByte)
+	nWritten, err := writer.Write(headerByte)
 	if err != nil {
 		return err
 	}
-	if nWriten != 10 {
+	if nWritten != 10 {
 		return errors.New("Writing error")
 	}
 	return nil
@@ -605,10 +605,6 @@ func ReadID3v23(input io.ReadSeeker) (*ID3v23, error) {
 		}
 		// Frame identifier
 		key := string(bytesExtendedHeader[0:4])
-
-		/*if bytesExtendedHeader[0] == 0 && bytesExtendedHeader[1] == 0 && bytesExtendedHeader[2] == 0 && bytesExtendedHeader[3] == 0 {
-			break
-		}*/
 
 		// Frame data size
 		size := ByteToInt(bytesExtendedHeader[4:8])
