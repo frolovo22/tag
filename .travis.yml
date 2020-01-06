@@ -17,7 +17,7 @@ notifications:
   email: false
 
 script:
-  - go test -v -coverprofile=coverage.txt -covermode=atomic ./tests
+  - go test -v -coverpkg=./tests -coverprofile=coverage.txt -covermode=atomic ./tests
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
