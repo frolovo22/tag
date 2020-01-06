@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/frolovo22/tag.svg?branch=master)](https://travis-ci.org/frolovo22/tag)
 [![Go Report Card](https://goreportcard.com/badge/github.com/frolovo22/tag)](https://goreportcard.com/report/github.com/frolovo22/tag)
-
+[![codecov](https://codecov.io/gh/frolovo22/tag/branch/master/graph/badge.svg)](https://codecov.io/gh/frolovo22/tag)
 # Tag
 
 Its pure golang library for parsing and editing tags in mp3, mp4 and flac formats
