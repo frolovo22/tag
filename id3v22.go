@@ -4,8 +4,11 @@ import (
 	"errors"
 	"image"
 	"io"
+	"strconv"
 	"time"
 )
+
+const FRAME_HEADER_SIZE = 6
 
 type ID3v22Frame struct {
 	Key   string
@@ -35,15 +38,19 @@ func (id3v2 *ID3v22) GetTitle() (string, error) {
 }
 
 func (id3v2 *ID3v22) GetArtist() (string, error) {
-	panic("implement me")
+	return id3v2.GetString("TP1")
 }
 
 func (id3v2 *ID3v22) GetAlbum() (string, error) {
-	panic("implement me")
+	return id3v2.GetString("TAL")
 }
 
 func (id3v2 *ID3v22) GetYear() (int, error) {
-	panic("implement me")
+	year, err := id3v2.GetString("TYE")
+	if err != nil {
+		return 0, nil
+	}
+	return strconv.Atoi(year)
 }
 
 func (id3v2 *ID3v22) GetComment() (string, error) {
@@ -341,7 +348,7 @@ func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 
 	curRead := 0
 	for curRead < length {
-		bytesExtendedHeader := make([]byte, 6)
+		bytesExtendedHeader := make([]byte, FRAME_HEADER_SIZE)
 		nReaded, err = input.Read(bytesExtendedHeader)
 		if err != nil {
 			return nil, err
@@ -353,7 +360,7 @@ func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 		key := string(bytesExtendedHeader[0:3])
 
 		// Frame data size
-		size := ByteToInt(bytesExtendedHeader[3:6])
+		size := ByteToInt(bytesExtendedHeader[3:FRAME_HEADER_SIZE])
 
 		bytesExtendedValue := make([]byte, size)
 		nReaded, err = input.Read(bytesExtendedValue)
@@ -382,7 +389,7 @@ func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 			bytesExtendedValue,
 		})
 
-		curRead += 6 + size
+		curRead += FRAME_HEADER_SIZE + size
 
 	}
 	return &header, nil
