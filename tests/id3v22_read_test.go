@@ -3,6 +3,7 @@ package tests
 import (
 	"github.com/frolovo22/tag"
 	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 )
 
@@ -13,6 +14,8 @@ func TestId3v22Read(t *testing.T) {
 	if err != nil {
 		return
 	}
+
+	asrt.Equal("*tag.ID3v22", reflect.TypeOf(id3).String())
 
 	title, err := id3.GetTitle()
 	asrt.NoError(err)
@@ -29,4 +32,12 @@ func TestId3v22Read(t *testing.T) {
 	year, err := id3.GetYear()
 	asrt.NoError(err)
 	asrt.Equal(2006, year)
+
+	genre, err := id3.GetGenre()
+	asrt.NoError(err)
+	asrt.Equal("Alternative", genre)
+
+	encodedBy, err := id3.GetEncodedBy()
+	asrt.NoError(err)
+	asrt.Equal("iTunes v7.0.2.16", encodedBy)
 }
