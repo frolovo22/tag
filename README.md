@@ -22,7 +22,7 @@ go install github.com/frolovo22/tag
 |-------------------|-------------|---------|-----------------------|-----------------------|-----------------|------------------------|
 | Title             | Title       | TT2     | TIT2                  | TIT2                  | \xa9nam         | TITLE                  |       
 | Artist            | Artist      | TP1     | TPE1                  | TPE1                  | \xa9art         | ARTIST                 |
-| Album             | Album       | TOT     | TALB                  | TALB                  | \xa9alb         | ALBUM                  |
+| Album             | Album       | TAL     | TALB                  | TALB                  | \xa9alb         | ALBUM                  |
 | Year              | Year        | TYE     | TYER                  | TDOR                  | \xa9day         | YEAR                   |
 | Comment           | Comment     | COM     | COMM                  | COMM                  |                 | COMMENT                |
 | Genre             | Genre       | -       | TCON                  | TCON                  | \xa9gen         | GENRE                  |
