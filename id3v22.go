@@ -4,6 +4,7 @@ import (
 	"errors"
 	"image"
 	"io"
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -58,7 +59,20 @@ func (id3v2 *ID3v22) GetComment() (string, error) {
 }
 
 func (id3v2 *ID3v22) GetGenre() (string, error) {
-	panic("implement me")
+	genre, err := id3v2.GetString("TCO")
+	if err != nil {
+		return "", err
+	}
+	re := regexp.MustCompile(`\([0-9]+\)`)
+	match := re.FindAllString(genre, -1)
+	if len(match) > 0 {
+		code, err := strconv.Atoi(match[0][1 : len(match[0])-1])
+		if err != nil {
+			return "", err
+		}
+		return genres[code], nil
+	}
+	return "", nil
 }
 
 func (id3v2 *ID3v22) GetAlbumArtist() (string, error) {
@@ -110,7 +124,7 @@ func (id3v2 *ID3v22) GetDiscNumber() (int, int, error) {
 }
 
 func (id3v2 *ID3v22) GetEncodedBy() (string, error) {
-	panic("implement me")
+	return id3v2.GetString("TEN")
 }
 
 func (id3v2 *ID3v22) GetTrackNumber() (int, int, error) {
