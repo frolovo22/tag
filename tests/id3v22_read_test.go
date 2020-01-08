@@ -17,4 +17,16 @@ func TestId3v22Read(t *testing.T) {
 	title, err := id3.GetTitle()
 	asrt.NoError(err)
 	asrt.Equal("You Are The One", title)
+
+	album, err := id3.GetAlbum()
+	asrt.NoError(err)
+	asrt.Equal("We Are Pilots", album)
+
+	artist, err := id3.GetArtist()
+	asrt.NoError(err)
+	asrt.Equal("Shiny Toy Guns", artist)
+
+	year, err := id3.GetYear()
+	asrt.NoError(err)
+	asrt.Equal(2006, year)
 }
