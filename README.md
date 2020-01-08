@@ -25,7 +25,7 @@ go install github.com/frolovo22/tag
 | Album             | Album       | TAL     | TALB                  | TALB                  | \xa9alb         | ALBUM                  |
 | Year              | Year        | TYE     | TYER                  | TDOR                  | \xa9day         | YEAR                   |
 | Comment           | Comment     | COM     | COMM                  | COMM                  |                 | COMMENT                |
-| Genre             | Genre       | -       | TCON                  | TCON                  | \xa9gen         | GENRE                  |
+| Genre             | Genre       | TCO     | TCON                  | TCON                  | \xa9gen         | GENRE                  |
 | Album Artist      | -           | TOA     | TPE2                  | TPE2                  | aART            | ALBUMARTIST            | 
 | Date              | -           | TIM     | TYER                  | TDRC                  |                 | DATE                   |
 | Arranger          | -           | -       | IPLS                  | IPLS                  |                 | ARRANGER               |
