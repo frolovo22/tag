@@ -60,23 +60,14 @@ func TestMp4Read(t *testing.T) {
 
 	picture, err := mp4.GetPicture()
 	asrt.NoError(err)
-	if err == nil {
-		out, err := ioutil.TempFile("", "mp4_test.jpg")
-		if err != nil {
-			asrt.NoError(err)
-			return
-		}
-		defer os.Remove(out.Name())
+	out, err := ioutil.TempFile("", "mp4_test.jpg")
+	asrt.NoError(err)
+	defer os.Remove(out.Name())
+	err = jpeg.Encode(out, picture, &jpeg.Options{
+		Quality: 95,
+	})
+	asrt.NoError(err)
+	cmp := compareFiles("cat_walking_cover.jpg", out.Name())
+	asrt.Equal(true, cmp)
 
-		err = jpeg.Encode(out, picture, &jpeg.Options{
-			Quality: 95,
-		})
-		if err != nil {
-			asrt.NoError(err)
-			return
-		}
-
-		cmp := compareFiles("cat_walking_cover.jpg", out.Name())
-		asrt.Equal(true, cmp)
-	}
 }
