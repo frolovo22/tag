@@ -36,21 +36,12 @@ func TestFLACRead(t *testing.T) {
 
 	picture, err := flac.GetPicture()
 	asrt.NoError(err)
-	if err == nil {
-		out, err := ioutil.TempFile("", "flacTst.png")
-		if err != nil {
-			asrt.NoError(err)
-			return
-		}
-		defer os.Remove(out.Name())
+	out, err := ioutil.TempFile("", "flacTst.png")
+	asrt.NoError(err)
+	defer os.Remove(out.Name())
+	err = png.Encode(out, picture)
+	asrt.NoError(err)
+	cmp := compareFiles("flac.png", out.Name())
+	asrt.Equal(true, cmp)
 
-		err = png.Encode(out, picture)
-		if err != nil {
-			asrt.NoError(err)
-			return
-		}
-
-		cmp := compareFiles("flac.png", out.Name())
-		asrt.Equal(true, cmp)
-	}
 }

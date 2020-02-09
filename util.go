@@ -58,6 +58,19 @@ const (
 	encodingUTF16BE string = "UTF-16BE"
 )
 
+func GetEncoding(code byte) string {
+	if code == 0 || code == 3 {
+		return encodingUTF8
+	}
+	if code == 1 {
+		return encodingUTF16
+	}
+	if code == 2 {
+		return encodingUTF16BE
+	}
+	return ""
+}
+
 /*
 *	Text Encoding for text frame header
 *	First byte determinate text encoding. If ISO-8859-1 is used this byte should be $00, if Unicode is used it should be $01
@@ -68,19 +81,7 @@ func TextEncoding(b []byte) string {
 		return ""
 	}
 
-	if b[0] == 0 || b[0] == 3 {
-		return encodingUTF8
-	}
-
-	if b[0] == 1 {
-		return encodingUTF16
-	}
-
-	if b[0] == 2 {
-		return encodingUTF16BE
-	}
-
-	return ""
+	return GetEncoding(b[0])
 }
 
 func DecodeString(b []byte, encoding string) (string, error) {
@@ -277,4 +278,26 @@ func colorModelToBitsPerPixel(model color.Model) int {
 		bpp = 8
 	}
 	return bpp
+}
+
+func SplitBytesWithTextDescription(data []byte, encoding string) [][]byte {
+	separator := []byte{0}
+	if encoding == encodingUTF16 || encoding == encodingUTF16BE {
+		separator = []byte{0, 0}
+	}
+
+	result := bytes.SplitN(data, separator, 2)
+	if len(result) != 2 {
+		return result
+	}
+
+	if len(result[1]) == 0 {
+		return result
+	}
+
+	if result[1][0] == 0 {
+		result[0] = append(result[0], result[1][0])
+		result[1] = result[1][1:]
+	}
+	return result
 }

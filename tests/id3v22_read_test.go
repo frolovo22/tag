@@ -3,6 +3,9 @@ package tests
 import (
 	"github.com/frolovo22/tag"
 	"github.com/stretchr/testify/assert"
+	"image/png"
+	"io/ioutil"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -40,4 +43,14 @@ func TestId3v22Read(t *testing.T) {
 	encodedBy, err := id3.GetEncodedBy()
 	asrt.NoError(err)
 	asrt.Equal("iTunes v7.0.2.16", encodedBy)
+
+	picture, err := id3.GetPicture()
+	asrt.NoError(err)
+	out, err := ioutil.TempFile("", "idv22Tst.jpg")
+	asrt.NoError(err)
+	defer os.Remove(out.Name())
+	err = png.Encode(out, picture)
+	asrt.NoError(err)
+	cmp := compareFiles("idv22.jpg", out.Name())
+	asrt.Equal(true, cmp)
 }

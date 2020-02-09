@@ -1,8 +1,11 @@
 package tag
 
 import (
+	"bytes"
 	"errors"
 	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"regexp"
 	"strconv"
@@ -132,7 +135,52 @@ func (id3v2 *ID3v22) GetTrackNumber() (int, int, error) {
 }
 
 func (id3v2 *ID3v22) GetPicture() (image.Image, error) {
-	panic("implement me")
+	pic, err := id3v2.GetAttachedPicture()
+	if err != nil {
+		return nil, err
+	}
+	switch pic.MIME {
+	case "image/jpeg":
+		return jpeg.Decode(bytes.NewReader(pic.Data))
+	case "image/png":
+		return png.Decode(bytes.NewReader(pic.Data))
+	default:
+		return nil, ErrorIncorrectTag
+	}
+}
+
+func (id3v2 *ID3v22) GetAttachedPicture() (*AttachedPicture, error) {
+	var picture AttachedPicture
+
+	bytes, err := id3v2.GetBytes("PIC")
+	if err != nil {
+		return nil, err
+	}
+
+	textEncoding := bytes[0]
+	mimeText := string(bytes[1:4])
+	if mimeText == "JPG" {
+		picture.MIME = "image/jpeg"
+	} else if mimeText == "PNG" {
+		picture.MIME = "image/png"
+	}
+
+	picture.PictureType = bytes[4]
+
+	values := SplitBytesWithTextDescription(bytes[5:], GetEncoding(textEncoding))
+	if len(values) != 2 {
+		return nil, ErrorIncorrectTag
+	}
+
+	desc, err := DecodeString(values[0], GetEncoding(textEncoding))
+	if err != nil {
+		return nil, err
+	}
+
+	picture.Description = desc
+	picture.Data = values[1]
+
+	return &picture, nil
 }
 
 func (id3v2 *ID3v22) SetTitle(title string) error {
@@ -442,4 +490,13 @@ func (id3v2 *ID3v22) GetString(name string) (string, error) {
 		}
 	}
 	return "", ErrorTagNotFound
+}
+
+func (id3v2 *ID3v22) GetBytes(name string) ([]byte, error) {
+	for _, val := range id3v2.Frames {
+		if val.Key == name {
+			return val.Value, nil
+		}
+	}
+	return nil, ErrorTagNotFound
 }
