@@ -53,4 +53,9 @@ func TestId3v22Read(t *testing.T) {
 	asrt.NoError(err)
 	cmp := compareFiles("idv22.jpg", out.Name())
 	asrt.Equal(true, cmp)
+
+	trackNumber, totalNumber, err := id3.GetTrackNumber()
+	asrt.NoError(err)
+	asrt.Equal(1, trackNumber)
+	asrt.Equal(11, totalNumber)
 }
