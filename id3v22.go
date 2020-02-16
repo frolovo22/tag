@@ -9,6 +9,7 @@ import (
 	"io"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -131,7 +132,30 @@ func (id3v2 *ID3v22) GetEncodedBy() (string, error) {
 }
 
 func (id3v2 *ID3v22) GetTrackNumber() (int, int, error) {
-	panic("implement me")
+	track, err := id3v2.GetString("TRK")
+	if err != nil {
+		return 0, 0, err
+	}
+	parts := strings.Split(track, "/")
+	if len(parts) == 1 {
+		number, err := strconv.Atoi(parts[0])
+		if err != nil {
+			return 0, 0, err
+		}
+		return number, number, nil
+	} else if len(parts) == 2 {
+		number1, err := strconv.Atoi(parts[0])
+		if err != nil {
+			return 0, 0, err
+		}
+		number2, err := strconv.Atoi(parts[1])
+		if err != nil {
+			return 0, 0, err
+		}
+		return number1, number2, nil
+	}
+
+	return 0, 0, ErrorIncorrectTag
 }
 
 func (id3v2 *ID3v22) GetPicture() (image.Image, error) {
