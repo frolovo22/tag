@@ -178,7 +178,7 @@ func (mp4 *MP4) GetTrackNumber() (int, int, error) {
 func (mp4 *MP4) GetPicture() (image.Image, error) {
 	pictureBlock, ok := mp4.data[MP4_TAG_PICTURE]
 	if !ok {
-		return nil, ErrorTagNotFound
+		return nil, ErrTagNotFound
 	}
 	picture := pictureBlock.(AttachedPicture)
 	switch picture.MIME {
@@ -188,7 +188,7 @@ func (mp4 *MP4) GetPicture() (image.Image, error) {
 		return png.Decode(bytes.NewReader(picture.Data))
 	}
 
-	return nil, ErrorIncorrectTag
+	return nil, ErrIncorrectTag
 }
 
 func (MP4) SetTitle(title string) error {
@@ -374,7 +374,7 @@ func (MP4) Save(input io.WriteSeeker) error {
 func (mp4 *MP4) getString(tag string) (string, error) {
 	val, ok := mp4.data[tag]
 	if !ok {
-		return "", ErrorTagNotFound
+		return "", ErrTagNotFound
 	}
 	return val.(string), nil
 }
@@ -382,7 +382,7 @@ func (mp4 *MP4) getString(tag string) (string, error) {
 func (mp4 *MP4) getInt(tag string) (int, error) {
 	val, ok := mp4.data[tag]
 	if !ok {
-		return 0, ErrorTagNotFound
+		return 0, ErrTagNotFound
 	}
 	return val.(int), nil
 }
@@ -417,7 +417,7 @@ func ReadMp4(input io.ReadSeeker) (*MP4, error) {
 	// Seek to file start
 	startIndex, err := input.Seek(0, io.SeekStart)
 	if startIndex != 0 {
-		return nil, ErrorSeekFile
+		return nil, ErrSeekFile
 	}
 
 	if err != nil {

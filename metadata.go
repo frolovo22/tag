@@ -34,17 +34,17 @@ func (v TagVersion) String() string {
 }
 
 var (
-	ErrorUnsupportedFormat = errors.New("unsupported format")
-	ErrorIncorrectLength   = errors.New("tag incorrect length")
-	ErrorUnsupportedTag    = errors.New("unsupported tag")
-	ErrorTagNotFound       = errors.New("tag not found")
-	ErrorEmptyFile         = errors.New("empty file")
-	ErrorFileMarker        = errors.New("error file marker")
-	ErrorReadFile          = errors.New("error read file")
-	ErrorIncorrectGenre    = errors.New("incorrect genre")
-	ErrorSeekFile          = errors.New("error seek file")
-	ErrorWriteFile         = errors.New("error write file")
-	ErrorIncorrectTag      = errors.New("incorrect tag")
+	ErrUnsupportedFormat = errors.New("unsupported format")
+	ErrIncorrectLength   = errors.New("tag incorrect length")
+	ErrUnsupportedTag    = errors.New("unsupported tag")
+	ErrTagNotFound       = errors.New("tag not found")
+	ErrEmptyFile         = errors.New("empty file")
+	ErrFileMarker        = errors.New("error file marker")
+	ErrReadFile          = errors.New("error read file")
+	ErrIncorrectGenre    = errors.New("incorrect genre")
+	ErrSeekFile          = errors.New("error seek file")
+	ErrWriteFile         = errors.New("error write file")
+	ErrIncorrectTag      = errors.New("incorrect tag")
 )
 
 type GetMetadata interface {

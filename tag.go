@@ -31,9 +31,9 @@ func Read(input io.ReadSeeker) (Metadata, error) {
 	case TagVersionFLAC:
 		return ReadFLAC(input)
 	default:
-		return nil, ErrorUnsupportedFormat
+		return nil, ErrUnsupportedFormat
 	}
-	return nil, ErrorUnsupportedFormat
+	return nil, ErrUnsupportedFormat
 }
 
 func CheckVersion(input io.ReadSeeker) TagVersion {

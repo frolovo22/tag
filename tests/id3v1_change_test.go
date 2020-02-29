@@ -74,7 +74,7 @@ func TestId3v1Change(t *testing.T) {
 	asrt.Equal("Jazz", genre)
 
 	trackNumber, totalTracks, err := change.GetTrackNumber()
-	asrt.Equal(tag.ErrorTagNotFound, err)
+	asrt.Equal(tag.ErrTagNotFound, err)
 	asrt.Equal(0, trackNumber)
 	asrt.Equal(0, totalTracks)
 

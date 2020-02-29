@@ -72,7 +72,7 @@ func ReadID3v1(input io.ReadSeeker) (*ID3v1, error) {
 	// Type
 	marker := string(headerByte[0:3])
 	if marker != "TAG" {
-		return nil, ErrorFileMarker
+		return nil, ErrFileMarker
 	}
 	header.Type = marker
 
@@ -88,7 +88,7 @@ func ReadID3v1(input io.ReadSeeker) (*ID3v1, error) {
 	// Year
 	header.Year, err = strconv.Atoi(string(headerByte[93:97]))
 	if err != nil {
-		return nil, ErrorReadFile
+		return nil, ErrReadFile
 	}
 
 	// Comment
@@ -217,7 +217,7 @@ func (id3v1 *ID3v1) Save(input io.WriteSeeker) error {
 
 func writeString(input io.Writer, data string, size int) error {
 	if len(data) > size {
-		return ErrorWriteFile
+		return ErrWriteFile
 	}
 
 	bytesStr := make([]byte, size)
@@ -229,7 +229,7 @@ func writeString(input io.Writer, data string, size int) error {
 		return err
 	}
 	if n != size {
-		return ErrorWriteFile
+		return ErrWriteFile
 	}
 
 	return nil
@@ -276,71 +276,71 @@ func (id3v1 *ID3v1) GetGenre() (string, error) {
 }
 
 func (id3v1 *ID3v1) GetAlbumArtist() (string, error) {
-	return "", ErrorUnsupportedTag
+	return "", ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetDate() (time.Time, error) {
-	return time.Now(), ErrorUnsupportedTag
+	return time.Now(), ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetArranger() (string, error) {
-	return "", ErrorUnsupportedTag
+	return "", ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetAuthor() (string, error) {
-	return "", ErrorUnsupportedTag
+	return "", ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetBMP() (int, error) {
-	return 0, ErrorUnsupportedTag
+	return 0, ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetCatalogNumber() (string, error) {
-	return "", ErrorUnsupportedTag
+	return "", ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetCompilation() (string, error) {
-	return "", ErrorUnsupportedTag
+	return "", ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetComposer() (string, error) {
-	return "", ErrorUnsupportedTag
+	return "", ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetConductor() (string, error) {
-	return "", ErrorUnsupportedTag
+	return "", ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetCopyright() (string, error) {
-	return "", ErrorUnsupportedTag
+	return "", ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetDescription() (string, error) {
-	return "", ErrorUnsupportedTag
+	return "", ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetDiscNumber() (int, int, error) {
-	return 0, 0, ErrorUnsupportedTag
+	return 0, 0, ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetEncodedBy() (string, error) {
-	return "", ErrorUnsupportedTag
+	return "", ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) GetTrackNumber() (int, int, error) {
 	if id3v1.ZeroByte == 0 {
 		return int(id3v1.Track), int(id3v1.Track), nil
 	}
-	return 0, 0, ErrorTagNotFound
+	return 0, 0, ErrTagNotFound
 }
 
 func (id3v1 *ID3v1) GetPicture() (image.Image, error) {
-	return nil, ErrorUnsupportedTag
+	return nil, ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetTitle(title string) error {
 	if len(title) > 30 {
-		return ErrorIncorrectLength
+		return ErrIncorrectLength
 	}
 	id3v1.Title = title
 	return nil
@@ -348,7 +348,7 @@ func (id3v1 *ID3v1) SetTitle(title string) error {
 
 func (id3v1 *ID3v1) SetArtist(artist string) error {
 	if len(artist) > 30 {
-		return ErrorIncorrectLength
+		return ErrIncorrectLength
 	}
 	id3v1.Artist = artist
 	return nil
@@ -356,7 +356,7 @@ func (id3v1 *ID3v1) SetArtist(artist string) error {
 
 func (id3v1 *ID3v1) SetAlbum(album string) error {
 	if len(album) > 30 {
-		return ErrorIncorrectLength
+		return ErrIncorrectLength
 	}
 	id3v1.Album = album
 	return nil
@@ -369,10 +369,10 @@ func (id3v1 *ID3v1) SetYear(year int) error {
 
 func (id3v1 *ID3v1) SetComment(comment string) error {
 	if len(comment) > 30 {
-		return ErrorIncorrectLength
+		return ErrIncorrectLength
 	}
 	if id3v1.ZeroByte == 0 && len(comment) > 28 {
-		return ErrorIncorrectLength
+		return ErrIncorrectLength
 	}
 	id3v1.Comment = comment
 	return nil
@@ -385,64 +385,64 @@ func (id3v1 *ID3v1) SetGenre(genre string) error {
 			return nil
 		}
 	}
-	return ErrorIncorrectGenre
+	return ErrIncorrectGenre
 }
 
 func (id3v1 *ID3v1) SetAlbumArtist(albumArtist string) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetDate(date time.Time) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetArranger(arranger string) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetAuthor(author string) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetBMP(bmp int) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetCatalogNumber(catalogNumber string) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetCompilation(compilation string) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetComposer(composer string) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetConductor(conductor string) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetCopyright(copyright string) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetDescription(description string) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetDiscNumber(number int, total int) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetEncodedBy(encodedBy string) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) SetTrackNumber(number int, total int) error {
 	if len(id3v1.Comment) > 28 {
-		return ErrorIncorrectLength
+		return ErrIncorrectLength
 	}
 	id3v1.ZeroByte = 0
 	id3v1.Track = byte(number)
@@ -450,7 +450,7 @@ func (id3v1 *ID3v1) SetTrackNumber(number int, total int) error {
 }
 
 func (id3v1 *ID3v1) SetPicture(picture image.Image) error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteAll() error {
@@ -496,55 +496,55 @@ func (id3v1 *ID3v1) DeleteGenre() error {
 }
 
 func (id3v1 *ID3v1) DeleteAlbumArtist() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteDate() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteArranger() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteAuthor() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteBMP() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteCatalogNumber() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteCompilation() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteComposer() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteConductor() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteCopyright() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteDescription() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteDiscNumber() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteEncodedBy() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
 
 func (id3v1 *ID3v1) DeleteTrackNumber() error {
@@ -554,5 +554,5 @@ func (id3v1 *ID3v1) DeleteTrackNumber() error {
 }
 
 func (id3v1 *ID3v1) DeletePicture() error {
-	return ErrorUnsupportedTag
+	return ErrUnsupportedTag
 }
