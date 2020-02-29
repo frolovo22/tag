@@ -145,7 +145,7 @@ func (flac *FLAC) GetPicture() (image.Image, error) {
 		return downloadImage(string(pictureBlock.PictureData))
 	}
 
-	return nil, ErrorIncorrectTag
+	return nil, ErrIncorrectTag
 }
 
 func (flac *FLAC) SetTitle(title string) error {
@@ -458,7 +458,7 @@ func ReadFLAC(input io.ReadSeeker) (*FLAC, error) {
 	}
 
 	if string(data) != "fLaC" {
-		return nil, ErrorFileMarker
+		return nil, ErrFileMarker
 	}
 
 	// read blocks
@@ -515,7 +515,7 @@ func readMeatadataBlock(input io.Reader) (*FlacMeatadataBlock, error) {
 	// 1-7 bits
 	blockType := headerBytes[0] & 0x7F
 	if blockType > 6 {
-		return nil, ErrorReadFile
+		return nil, ErrReadFile
 	}
 	header.Type = FlacMetadataBlockType(blockType)
 
@@ -538,7 +538,7 @@ type VorbisComment struct {
 func (flac *FLAC) GetVorbisComment(key string) (string, error) {
 	val, ok := flac.Tags[key]
 	if !ok {
-		return "", ErrorTagNotFound
+		return "", ErrTagNotFound
 	}
 	return val, nil
 }
@@ -582,7 +582,7 @@ func readVorbisComments(input io.Reader) ([]VorbisComment, string, error) {
 		// Parse data
 		vorbis := strings.SplitN(string(data), "=", 2)
 		if len(vorbis) != 2 {
-			return nil, "", ErrorIncorrectTag
+			return nil, "", ErrIncorrectTag
 		}
 
 		comment := VorbisComment{
@@ -637,7 +637,7 @@ func (flac *FLAC) GetMetadataBlockPicture() (*FlacMetadataBlockPicture, error) {
 		}
 	}
 
-	return nil, ErrorTagNotFound
+	return nil, ErrTagNotFound
 }
 
 func readFlacPicture(input io.Reader) (*FlacMetadataBlockPicture, error) {

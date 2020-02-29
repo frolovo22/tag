@@ -114,7 +114,7 @@ func (id3v2 *ID3v24) GetComment() (string, error) {
 	}
 
 	if len(commentStr) < 4 {
-		return "", ErrorIncorrectLength
+		return "", ErrIncorrectLength
 	}
 
 	return commentStr[4:], nil
@@ -175,7 +175,7 @@ func (id3v2 *ID3v24) GetDiscNumber() (int, int, error) {
 	}
 	numbers := strings.Split(dickNumber, "/")
 	if len(numbers) != 2 {
-		return 0, 0, ErrorIncorrectLength
+		return 0, 0, ErrIncorrectLength
 	}
 	number, err := strconv.Atoi(numbers[0])
 	if err != nil {
@@ -210,7 +210,7 @@ func (id3v2 *ID3v24) GetPicture() (image.Image, error) {
 	case "-->":
 		return downloadImage(string(pic.Data))
 	default:
-		return nil, ErrorIncorrectTag
+		return nil, ErrIncorrectTag
 	}
 }
 
@@ -553,7 +553,7 @@ func checkID3v24(input io.ReadSeeker) bool {
 func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 	header := ID3v24{}
 	if input == nil {
-		return nil, ErrorEmptyFile
+		return nil, ErrEmptyFile
 	}
 
 	// Header size
@@ -572,7 +572,7 @@ func ReadID3v24(input io.ReadSeeker) (*ID3v24, error) {
 	// Version
 	versionByte := headerByte[3]
 	if versionByte != 4 {
-		return nil, ErrorUnsupportedFormat
+		return nil, ErrUnsupportedFormat
 	}
 	header.Version = TagVersionID3v24
 
@@ -639,7 +639,7 @@ func (id3v2 *ID3v24) GetString(name string) (string, error) {
 			return GetString(val.Value)
 		}
 	}
-	return "", ErrorTagNotFound
+	return "", ErrTagNotFound
 }
 
 func (id3v2 *ID3v24) SetString(name string, value string) error {
@@ -696,7 +696,7 @@ func (id3v2 *ID3v24) GetAttachedPicture() (*AttachedPicture, error) {
 	}
 	values := strings.SplitN(picStr, "\x00", 3)
 	if len(values) != 3 {
-		return nil, ErrorIncorrectTag
+		return nil, ErrIncorrectTag
 	}
 
 	// MIME
@@ -704,7 +704,7 @@ func (id3v2 *ID3v24) GetAttachedPicture() (*AttachedPicture, error) {
 
 	// Type
 	if len(values[1]) == 0 {
-		return nil, ErrorIncorrectTag
+		return nil, ErrIncorrectTag
 	}
 	picture.PictureType = values[1][0]
 
@@ -764,7 +764,7 @@ func (id3v2 *ID3v24) DeleteTagTXXX(name string) error {
 			}
 			info := strings.SplitN(str, "\x00", 2)
 			if len(info) != 2 {
-				return ErrorIncorrectTag
+				return ErrIncorrectTag
 			}
 			if info[0] == name {
 				index = i
@@ -794,14 +794,14 @@ func (id3v2 *ID3v24) GetStringTXXX(name string) (string, error) {
 			}
 			info := strings.SplitN(str, "\x00", 2)
 			if len(info) != 2 {
-				return "", ErrorIncorrectTag
+				return "", ErrIncorrectTag
 			}
 			if info[0] == name {
 				return info[1], nil
 			}
 		}
 	}
-	return "", ErrorTagNotFound
+	return "", ErrTagNotFound
 }
 
 func (id3v2 *ID3v24) SetStringTXXX(name string, value string) error {

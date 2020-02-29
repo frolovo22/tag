@@ -14,12 +14,12 @@ import (
 
 func seekAndRead(input io.ReadSeeker, offset int64, whence int, read int) ([]byte, error) {
 	if input == nil {
-		return nil, ErrorEmptyFile
+		return nil, ErrEmptyFile
 	}
 
 	_, err := input.Seek(offset, whence)
 	if err != nil {
-		return nil, ErrorSeekFile
+		return nil, ErrSeekFile
 	}
 
 	data := make([]byte, read)
@@ -28,7 +28,7 @@ func seekAndRead(input io.ReadSeeker, offset int64, whence int, read int) ([]byt
 		return nil, err
 	}
 	if nReaded != read {
-		return nil, ErrorReadFile
+		return nil, ErrReadFile
 	}
 
 	return data, nil
@@ -36,7 +36,7 @@ func seekAndRead(input io.ReadSeeker, offset int64, whence int, read int) ([]byt
 
 func readBytes(input io.Reader, size int) ([]byte, error) {
 	if input == nil {
-		return nil, ErrorEmptyFile
+		return nil, ErrEmptyFile
 	}
 
 	data := make([]byte, size)
@@ -46,7 +46,7 @@ func readBytes(input io.Reader, size int) ([]byte, error) {
 	}
 
 	if nReaded != size {
-		return nil, ErrorReadFile
+		return nil, ErrReadFile
 	}
 
 	return data, nil
@@ -201,7 +201,7 @@ func SetBit(data *byte, bit bool, index byte) {
 
 func GetString(b []byte) (string, error) {
 	if len(b) < 2 {
-		return "", ErrorIncorrectTag
+		return "", ErrIncorrectTag
 	}
 	return DecodeString(b[1:], TextEncoding(b))
 }

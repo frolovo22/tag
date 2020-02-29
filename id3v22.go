@@ -155,7 +155,7 @@ func (id3v2 *ID3v22) GetTrackNumber() (int, int, error) {
 		return number1, number2, nil
 	}
 
-	return 0, 0, ErrorIncorrectTag
+	return 0, 0, ErrIncorrectTag
 }
 
 func (id3v2 *ID3v22) GetPicture() (image.Image, error) {
@@ -169,7 +169,7 @@ func (id3v2 *ID3v22) GetPicture() (image.Image, error) {
 	case "image/png":
 		return png.Decode(bytes.NewReader(pic.Data))
 	default:
-		return nil, ErrorIncorrectTag
+		return nil, ErrIncorrectTag
 	}
 }
 
@@ -193,7 +193,7 @@ func (id3v2 *ID3v22) GetAttachedPicture() (*AttachedPicture, error) {
 
 	values := SplitBytesWithTextDescription(bytes[5:], GetEncoding(textEncoding))
 	if len(values) != 2 {
-		return nil, ErrorIncorrectTag
+		return nil, ErrIncorrectTag
 	}
 
 	desc, err := DecodeString(values[0], GetEncoding(textEncoding))
@@ -391,13 +391,13 @@ func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 	header := ID3v22{}
 
 	if input == nil {
-		return nil, ErrorEmptyFile
+		return nil, ErrEmptyFile
 	}
 
 	// Seek to file start
 	startIndex, err := input.Seek(0, io.SeekStart)
 	if startIndex != 0 {
-		return nil, ErrorSeekFile
+		return nil, ErrSeekFile
 	}
 
 	if err != nil {
@@ -425,7 +425,7 @@ func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 	// Version
 	versionByte := headerByte[3]
 	if versionByte != 2 {
-		return nil, ErrorUnsupportedFormat
+		return nil, ErrUnsupportedFormat
 	}
 
 	// Length
@@ -513,7 +513,7 @@ func (id3v2 *ID3v22) GetString(name string) (string, error) {
 			return GetString(val.Value)
 		}
 	}
-	return "", ErrorTagNotFound
+	return "", ErrTagNotFound
 }
 
 func (id3v2 *ID3v22) GetBytes(name string) ([]byte, error) {
@@ -522,5 +522,5 @@ func (id3v2 *ID3v22) GetBytes(name string) ([]byte, error) {
 			return val.Value, nil
 		}
 	}
-	return nil, ErrorTagNotFound
+	return nil, ErrTagNotFound
 }
