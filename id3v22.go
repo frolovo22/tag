@@ -74,7 +74,7 @@ func (id3v2 *ID3v22) GetGenre() (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return genres[code], nil
+		return genres[Genre(code)], nil
 	}
 	return "", nil
 }

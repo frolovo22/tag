@@ -1,7 +1,9 @@
 package tag
 
+type Genre byte
+
 // The following genres is defined in ID3v1
-var genres = map[int]string{
+var genres = map[Genre]string{
 	0:   "Blues",
 	1:   "Classic Rock",
 	2:   "Country",
@@ -196,4 +198,17 @@ var genres = map[int]string{
 	189: "Dubstep",
 	190: "Garage Rock",
 	191: "Psybient",
+}
+
+func (g Genre) String() string {
+	return genres[g]
+}
+
+func GetGenreByName(name string) (Genre, error) {
+	for key, val := range genres {
+		if val == name {
+			return key, nil
+		}
+	}
+	return Genre(0), ErrNotFoundGenre
 }
