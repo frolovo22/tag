@@ -34,6 +34,11 @@ func seekAndRead(input io.ReadSeeker, offset int64, whence int, read int) ([]byt
 	return data, nil
 }
 
+func seekAndReadString(input io.ReadSeeker, offset int64, whence int, read int) (string, error) {
+	data, err := seekAndRead(input, offset, whence, read)
+	return string(data), err
+}
+
 func readBytes(input io.Reader, size int) ([]byte, error) {
 	if input == nil {
 		return nil, ErrEmptyFile
@@ -50,6 +55,14 @@ func readBytes(input io.Reader, size int) ([]byte, error) {
 	}
 
 	return data, nil
+}
+
+func readString(input io.Reader, size int) (string, error) {
+	data, err := readBytes(input, size)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
 
 const (

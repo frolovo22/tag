@@ -10,6 +10,13 @@ import (
 	"time"
 )
 
+const (
+	id3v1SizeHeader    = 128 // ID3v1 constant header size
+	id3v1SizeType      = 3   // ID3v1 size of field 'Type'
+	id3v1NoGenre       = 255 // no genre value
+	id3v1NoTrackNumber = 1   // no track number
+)
+
 // fix size - 128 bytes
 type ID3v1 struct {
 	Type     string // Always 'TAG'
@@ -20,7 +27,7 @@ type ID3v1 struct {
 	Comment  string // length 28 or 30. The comment.
 	ZeroByte byte   // length 1. If a track number is stored, this byte contains a binary 0.
 	Track    byte   // length 1. The number of the track on the album, or 0. Invalid, if previous byte is not a binary 0.
-	Genre    byte   // length 1. Index in a list of genres, or 255
+	Genre    Genre  // length 1. Index in a list of genres, or 255
 
 	// another file data
 	Data []byte
@@ -46,25 +53,19 @@ func (id3v1 *ID3v1) String() string {
 }
 
 func checkID3v1(input io.ReadSeeker) bool {
-	// id3v1
-	data, err := seekAndRead(input, -128, io.SeekEnd, 3)
-	if err != nil {
+	marker, err := seekAndReadString(input, -id3v1SizeHeader, io.SeekEnd, id3v1SizeType)
+	if err != nil || marker != "TAG" {
 		return false
 	}
 
-	marker := string(data)
-	if marker == "TAG" {
-		return true
-	}
-
-	return false
+	return true
 }
 
 func ReadID3v1(input io.ReadSeeker) (*ID3v1, error) {
 	header := ID3v1{}
 
 	// 128 byte - Header size
-	headerByte, err := seekAndRead(input, -128, io.SeekEnd, 128)
+	headerByte, err := seekAndRead(input, -id3v1SizeHeader, io.SeekEnd, id3v1SizeHeader)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +106,7 @@ func ReadID3v1(input io.ReadSeeker) (*ID3v1, error) {
 
 	// Genre
 	// Index in a list of genres, or 255
-	header.Genre = headerByte[127]
+	header.Genre = Genre(headerByte[127])
 
 	// Read another file data
 	_, err = input.Seek(0, io.SeekStart)
@@ -207,7 +208,7 @@ func (id3v1 *ID3v1) Save(input io.WriteSeeker) error {
 		}
 	}
 
-	_, err = input.Write([]byte{id3v1.Genre})
+	_, err = input.Write([]byte{byte(id3v1.Genre)})
 	if err != nil {
 		return err
 	}
@@ -268,11 +269,7 @@ func (id3v1 *ID3v1) GetComment() (string, error) {
 }
 
 func (id3v1 *ID3v1) GetGenre() (string, error) {
-	genre, ok := genres[int(id3v1.Genre)]
-	if !ok {
-		return "", nil
-	}
-	return genre, nil
+	return id3v1.Genre.String(), nil
 }
 
 func (id3v1 *ID3v1) GetAlbumArtist() (string, error) {
@@ -379,13 +376,12 @@ func (id3v1 *ID3v1) SetComment(comment string) error {
 }
 
 func (id3v1 *ID3v1) SetGenre(genre string) error {
-	for key, val := range genres {
-		if val == genre {
-			id3v1.Genre = byte(key)
-			return nil
-		}
+	gen, err := GetGenreByName(genre)
+	if err != nil {
+		return err
 	}
-	return ErrIncorrectGenre
+	id3v1.Genre = gen
+	return nil
 }
 
 func (id3v1 *ID3v1) SetAlbumArtist(albumArtist string) error {
@@ -459,7 +455,7 @@ func (id3v1 *ID3v1) DeleteAll() error {
 	id3v1.Album = ""
 	id3v1.Year = 0
 	id3v1.Comment = ""
-	id3v1.ZeroByte = 1 // without track number
+	id3v1.ZeroByte = id3v1NoTrackNumber // without track number
 	id3v1.Track = 0
 	id3v1.Genre = 255
 	return nil
@@ -491,7 +487,7 @@ func (id3v1 *ID3v1) DeleteComment() error {
 }
 
 func (id3v1 *ID3v1) DeleteGenre() error {
-	id3v1.Genre = 255
+	id3v1.Genre = id3v1NoGenre
 	return nil
 }
 
@@ -548,7 +544,7 @@ func (id3v1 *ID3v1) DeleteEncodedBy() error {
 }
 
 func (id3v1 *ID3v1) DeleteTrackNumber() error {
-	id3v1.ZeroByte = 1
+	id3v1.ZeroByte = id3v1NoTrackNumber
 	id3v1.Track = 0
 	return nil
 }

@@ -41,10 +41,10 @@ var (
 	ErrEmptyFile         = errors.New("empty file")
 	ErrFileMarker        = errors.New("error file marker")
 	ErrReadFile          = errors.New("error read file")
-	ErrIncorrectGenre    = errors.New("incorrect genre")
 	ErrSeekFile          = errors.New("error seek file")
 	ErrWriteFile         = errors.New("error write file")
 	ErrIncorrectTag      = errors.New("incorrect tag")
+	ErrNotFoundGenre     = errors.New("not found genre")
 )
 
 type GetMetadata interface {
