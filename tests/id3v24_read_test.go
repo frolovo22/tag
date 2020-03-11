@@ -55,7 +55,7 @@ func TestId3v24Read(t *testing.T) {
 	asrt.NoError(err)
 	asrt.Equal("Kitten", author)
 
-	bpm, err := id3.GetBMP()
+	bpm, err := id3.GetBPM()
 	asrt.NoError(err)
 	asrt.Equal(777, bpm)
 

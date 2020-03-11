@@ -288,7 +288,7 @@ func (id3v1 *ID3v1) GetAuthor() (string, error) {
 	return "", ErrUnsupportedTag
 }
 
-func (id3v1 *ID3v1) GetBMP() (int, error) {
+func (id3v1 *ID3v1) GetBPM() (int, error) {
 	return 0, ErrUnsupportedTag
 }
 
@@ -400,7 +400,7 @@ func (id3v1 *ID3v1) SetAuthor(author string) error {
 	return ErrUnsupportedTag
 }
 
-func (id3v1 *ID3v1) SetBMP(bmp int) error {
+func (id3v1 *ID3v1) SetBPM(bmp int) error {
 	return ErrUnsupportedTag
 }
 
@@ -507,7 +507,7 @@ func (id3v1 *ID3v1) DeleteAuthor() error {
 	return ErrUnsupportedTag
 }
 
-func (id3v1 *ID3v1) DeleteBMP() error {
+func (id3v1 *ID3v1) DeleteBPM() error {
 	return ErrUnsupportedTag
 }
 

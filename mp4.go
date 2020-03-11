@@ -127,7 +127,7 @@ func (MP4) GetAuthor() (string, error) {
 	panic("implement me")
 }
 
-func (MP4) GetBMP() (int, error) {
+func (MP4) GetBPM() (int, error) {
 	panic("implement me")
 }
 
@@ -231,7 +231,7 @@ func (MP4) SetAuthor(author string) error {
 	panic("implement me")
 }
 
-func (MP4) SetBMP(bmp int) error {
+func (MP4) SetBPM(bmp int) error {
 	panic("implement me")
 }
 
@@ -319,7 +319,7 @@ func (MP4) DeleteAuthor() error {
 	panic("implement me")
 }
 
-func (MP4) DeleteBMP() error {
+func (MP4) DeleteBPM() error {
 	panic("implement me")
 }
 
