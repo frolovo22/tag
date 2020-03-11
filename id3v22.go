@@ -95,7 +95,7 @@ func (id3v2 *ID3v22) GetAuthor() (string, error) {
 	panic("implement me")
 }
 
-func (id3v2 *ID3v22) GetBMP() (int, error) {
+func (id3v2 *ID3v22) GetBPM() (int, error) {
 	panic("implement me")
 }
 
@@ -247,7 +247,7 @@ func (id3v2 *ID3v22) SetAuthor(author string) error {
 	panic("implement me")
 }
 
-func (id3v2 *ID3v22) SetBMP(bmp int) error {
+func (id3v2 *ID3v22) SetBPM(bmp int) error {
 	panic("implement me")
 }
 
@@ -335,7 +335,7 @@ func (id3v2 *ID3v22) DeleteAuthor() error {
 	panic("implement me")
 }
 
-func (id3v2 *ID3v22) DeleteBMP() error {
+func (id3v2 *ID3v22) DeleteBPM() error {
 	panic("implement me")
 }
 

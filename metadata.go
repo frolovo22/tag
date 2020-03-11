@@ -62,7 +62,7 @@ type GetMetadata interface {
 	GetDate() (time.Time, error)
 	GetArranger() (string, error)
 	GetAuthor() (string, error)
-	GetBMP() (int, error)
+	GetBPM() (int, error)
 	GetCatalogNumber() (string, error)
 	GetCompilation() (string, error)
 	GetComposer() (string, error)
@@ -86,7 +86,7 @@ type SetMetadata interface {
 	SetDate(date time.Time) error
 	SetArranger(arranger string) error
 	SetAuthor(author string) error
-	SetBMP(bmp int) error
+	SetBPM(bmp int) error
 	SetCatalogNumber(catalogNumber string) error
 	SetCompilation(compilation string) error
 	SetComposer(composer string) error
@@ -112,7 +112,7 @@ type DeleteMetadata interface {
 	DeleteDate() error
 	DeleteArranger() error
 	DeleteAuthor() error
-	DeleteBMP() error
+	DeleteBPM() error
 	DeleteCatalogNumber() error
 	DeleteCompilation() error
 	DeleteComposer() error

@@ -133,7 +133,7 @@ func (id3v2 *ID3v23) GetAuthor() (string, error) {
 	return id3v2.GetString("TOLY")
 }
 
-func (id3v2 *ID3v23) GetBMP() (int, error) {
+func (id3v2 *ID3v23) GetBPM() (int, error) {
 	return id3v2.GetInt("TBPM")
 }
 
@@ -250,7 +250,7 @@ func (id3v2 *ID3v23) SetAuthor(author string) error {
 	return id3v2.SetString("TOLY", author)
 }
 
-func (id3v2 *ID3v23) SetBMP(bmp int) error {
+func (id3v2 *ID3v23) SetBPM(bmp int) error {
 	return id3v2.SetInt("TBMP", bmp)
 }
 
@@ -362,7 +362,7 @@ func (id3v2 *ID3v23) DeleteAuthor() error {
 	return id3v2.DeleteTag("TOLY")
 }
 
-func (id3v2 *ID3v23) DeleteBMP() error {
+func (id3v2 *ID3v23) DeleteBPM() error {
 	return id3v2.DeleteTag("TBMP")
 }
 

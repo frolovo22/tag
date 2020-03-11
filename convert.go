@@ -39,7 +39,7 @@ func GetMap(metadata Metadata) map[string]interface{} {
 	if val, err = metadata.GetAuthor(); err == nil {
 		tags["author"] = val
 	}
-	if val, err = metadata.GetBMP(); err == nil {
+	if val, err = metadata.GetBPM(); err == nil {
 		tags["bmp"] = val
 	}
 	if val, err = metadata.GetCatalogNumber(); err == nil {

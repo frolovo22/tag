@@ -75,7 +75,7 @@ func (flac *FLAC) GetAuthor() (string, error) {
 	return flac.GetVorbisComment("AUTHOR")
 }
 
-func (flac *FLAC) GetBMP() (int, error) {
+func (flac *FLAC) GetBPM() (int, error) {
 	return flac.GetVorbisCommentInt("BPM")
 }
 
@@ -198,7 +198,7 @@ func (flac *FLAC) SetAuthor(author string) error {
 	return nil
 }
 
-func (flac *FLAC) SetBMP(bmp int) error {
+func (flac *FLAC) SetBPM(bmp int) error {
 	flac.Tags["BMP"] = strconv.Itoa(bmp)
 	return nil
 }
@@ -329,7 +329,7 @@ func (flac *FLAC) DeleteAuthor() error {
 	return nil
 }
 
-func (flac *FLAC) DeleteBMP() error {
+func (flac *FLAC) DeleteBPM() error {
 	delete(flac.Tags, "BPM")
 	return nil
 }
