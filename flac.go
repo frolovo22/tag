@@ -480,7 +480,9 @@ func ReadFLAC(input io.ReadSeeker) (*FLAC, error) {
 			}
 			flac.Vendor = vendor
 			for _, comment := range comments {
-				flac.Tags[comment.Name] = comment.Value
+				// case insensitive
+				field := strings.ToUpper(comment.Name)
+				flac.Tags[field] = comment.Value
 			}
 		} else {
 			flac.Blocks = append(flac.Blocks, block)
