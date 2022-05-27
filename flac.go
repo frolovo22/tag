@@ -24,7 +24,11 @@ type FLAC struct {
 }
 
 func (flac *FLAC) GetAllTagNames() []string {
-	panic("implement me")
+	result := make([]string, 0, len(flac.Tags))
+	for key, _ := range flac.Tags {
+		result = append(result, key)
+	}
+	return result
 }
 
 func (flac *FLAC) GetVersion() TagVersion {
