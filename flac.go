@@ -14,7 +14,7 @@ import (
 )
 
 type FLAC struct {
-	Blocks []*FlacMeatadataBlock
+	Blocks []*FlacMetadataBlock
 
 	// Vorbis Comment
 	Vendor string
@@ -439,7 +439,7 @@ const (
 	FlacPicture       FlacMetadataBlockType = 6
 )
 
-type FlacMeatadataBlock struct {
+type FlacMetadataBlock struct {
 	IsLast bool // Last-metadata-block flag: '1' if this block is the last metadata block before the audio blocks, '0' otherwise.
 	Type   FlacMetadataBlockType
 	Size   int
@@ -463,7 +463,7 @@ func ReadFLAC(input io.ReadSeeker) (*FLAC, error) {
 
 	// read blocks
 	for {
-		block, err := readMeatadataBlock(input)
+		block, err := readMetadataBlock(input)
 		if err != nil {
 			return nil, err
 		}
@@ -489,7 +489,7 @@ func ReadFLAC(input io.ReadSeeker) (*FLAC, error) {
 		}
 	}
 
-	// file data
+	// Read all remaining file data into the Data slice
 	flac.Data, err = ioutil.ReadAll(input)
 	if err != nil {
 		return nil, err
@@ -498,8 +498,8 @@ func ReadFLAC(input io.ReadSeeker) (*FLAC, error) {
 	return &flac, nil
 }
 
-func readMeatadataBlock(input io.Reader) (*FlacMeatadataBlock, error) {
-	header := FlacMeatadataBlock{}
+func readMetadataBlock(input io.Reader) (*FlacMetadataBlock, error) {
+	header := FlacMetadataBlock{}
 
 	// 4 - header size
 	headerBytes, err := readBytes(input, 4)
