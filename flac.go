@@ -520,11 +520,6 @@ func ReadFLAC(input io.ReadSeeker) (*FLAC, error) {
 			return nil, err
 		}
 
-		// last block before audio frame
-		if block.IsLast {
-			break
-		}
-
 		if block.Type == FlacVorbisComment {
 			comments, vendor, err := readVorbisComments(bytes.NewReader(block.Data))
 			if err != nil {
@@ -538,6 +533,11 @@ func ReadFLAC(input io.ReadSeeker) (*FLAC, error) {
 			}
 		} else {
 			flac.Blocks = append(flac.Blocks, block)
+		}
+
+		// last block before audio frame
+		if block.IsLast {
+			break
 		}
 	}
 
