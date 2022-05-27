@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"io"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -399,11 +400,58 @@ func (flac *FLAC) DeletePicture() error {
 }
 
 func (flac *FLAC) SaveFile(path string) error {
-	return nil
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	return flac.Save(file)
 }
 
 func (flac *FLAC) Save(input io.WriteSeeker) error {
+	// Sync metadata to its parent block
+	// Write out file header
+	// Then all metablocks
+	// Then all audio blocks
+	// Update comments
+
+	if _, err := input.Write([]byte("fLaC")); err != nil {
+		return err
+	}
+	metadataWritten := false
+	for i, meta := range flac.Blocks {
+		if meta.Type == FlacVorbisComment {
+			flac.Blocks[i].Data = serialiseVorbisComments(flac.Tags, flac.Vendor)
+			flac.Blocks[i].Size = len(flac.Blocks[i].Data)
+			metadataWritten = true
+			break
+		}
+		//
+	}
+	if !metadataWritten {
+		//Append a metadata block to the list
+		data := serialiseVorbisComments(flac.Tags, flac.Vendor)
+		block := &FlacMetadataBlock{
+			IsLast: false,
+			Type:   FlacVorbisComment,
+			Size:   len(data),
+			Data:   data,
+		}
+		flac.Blocks = append(flac.Blocks, block)
+	}
+
+	for i, meta := range flac.Blocks {
+		last := i == len(flac.Blocks)-1
+		if err := meta.Write(input, last); err != nil {
+			return err
+		}
+	}
+	if _, err := input.Write(flac.Data); err != nil {
+		return err
+	}
 	return nil
+
 }
 
 func checkFLAC(input io.ReadSeeker) bool {
@@ -536,6 +584,27 @@ func readMetadataBlock(input io.Reader) (*FlacMetadataBlock, error) {
 	return &header, nil
 }
 
+func (block *FlacMetadataBlock) Write(w io.Writer, isLast bool) error {
+	block.Size = len(block.Data)
+	block.IsLast = isLast
+	blockHeader := []byte{byte(block.Type) & 0x7F, 0, 0, 0}
+
+	if isLast {
+		blockHeader[0] |= 1 << 7
+	}
+	//3 bytes encodes the size in big endian
+	blockHeader[1] = byte((block.Size) >> 16)
+	blockHeader[2] = byte((block.Size) >> 8 & 0xFF)
+	blockHeader[3] = byte((block.Size) >> 0 & 0xFF)
+	if _, err := w.Write(blockHeader); err != nil {
+		return err
+	}
+	if _, err := w.Write(block.Data); err != nil {
+		return err
+	}
+	return nil
+}
+
 type VorbisComment struct {
 	Name  string
 	Value string
@@ -599,7 +668,37 @@ func readVorbisComments(input io.Reader) ([]VorbisComment, string, error) {
 	}
 	return result, string(vendorByte), nil
 }
-
+func serialiseVorbisComments(comments map[string]string, vendorHeader string) []byte {
+	//Serialise out the vorbis comments as a metadata block payload
+	//Spawn out all the tag blobs first
+	output := bytes.NewBuffer([]byte{})
+	for key, value := range comments {
+		line := key + "=" + value
+		if err := writeLengthData(output, binary.LittleEndian, []byte(line)); err != nil {
+			return []byte{}
+		}
+	}
+	//Now that we have the payload content figured out, we can reconstruct its headers
+	dataPayload, err := ioutil.ReadAll(output)
+	if err != nil {
+		return []byte{}
+	}
+	output.Grow(len(vendorHeader) + 4)
+	output.Reset() // clear our scratchpad
+	if err := writeLengthData(output, binary.LittleEndian, []byte(vendorHeader)); err != nil {
+		return []byte{}
+	}
+	userCommentLength := uint32(len(comments))
+	if err := binary.Write(output, binary.LittleEndian, userCommentLength); err != nil {
+		return []byte{}
+	}
+	output.Write(dataPayload)
+	payload, err := ioutil.ReadAll(output)
+	if err != nil {
+		return []byte{}
+	}
+	return payload
+}
 func (flac *FLAC) GetVorbisCommentInt(key string) (int, error) {
 	comment, err := flac.GetVorbisComment(key)
 	if err != nil {
