@@ -23,7 +23,7 @@ type FLAC struct {
 	Data []byte
 }
 
-func (F *FLAC) GetAllTagNames() []string {
+func (flac *FLAC) GetAllTagNames() []string {
 	panic("implement me")
 }
 
