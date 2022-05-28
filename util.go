@@ -246,7 +246,7 @@ func readLengthData(input io.Reader, order binary.ByteOrder) ([]byte, error) {
 }
 
 func writeLengthData(output io.Writer, order binary.ByteOrder, data []byte) error {
-	length := len(data)
+	length := uint32(len(data))
 	err := binary.Write(output, order, length)
 	if err != nil {
 		return err
