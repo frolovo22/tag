@@ -9,6 +9,7 @@ import (
 	"testing"
 )
 
+// nolint:funlen,gocyclo
 func TestFLACWrite(t *testing.T) {
 	asrt := assert.New(t)
 
@@ -29,12 +30,12 @@ func TestFLACWrite(t *testing.T) {
 		return
 	}
 
-	//Can't binary compare files as tag order is not deterministic
+	// Can't binary compare files as tag order is not deterministic
 
-	//Check file main data is untouched
+	// Check file main data is untouched
 	result := bytes.Compare(flac.GetFileData(), flac2.GetFileData())
 	asrt.Equal(result, 0)
-	//Compare metadata is 1:1
+	// Compare metadata is 1:1
 	if value, err := flac.GetTitle(); err == nil {
 		value2, err := flac2.GetTitle()
 		asrt.NoError(err)

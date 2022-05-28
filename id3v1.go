@@ -10,14 +10,8 @@ import (
 	"time"
 )
 
-const (
-	id3v1SizeHeader    = 128 // ID3v1 constant header size
-	id3v1SizeType      = 3   // ID3v1 size of field 'Type'
-	id3v1NoGenre       = 255 // no genre value
-	id3v1NoTrackNumber = 1   // no track number
-)
-
-// fix size - 128 bytes
+// ID3v1 - struct for store id3v1 data format
+// with fix size - 128 bytes.
 type ID3v1 struct {
 	Type     string // Always 'TAG'
 	Title    string // length 30. 30 characters of the title
@@ -54,7 +48,7 @@ func (id3v1 *ID3v1) String() string {
 
 func checkID3v1(input io.ReadSeeker) bool {
 	marker, err := seekAndReadString(input, -id3v1SizeHeader, io.SeekEnd, id3v1SizeType)
-	if err != nil || marker != "TAG" {
+	if err != nil || marker != id3MarkerName {
 		return false
 	}
 
@@ -72,7 +66,7 @@ func ReadID3v1(input io.ReadSeeker) (*ID3v1, error) {
 
 	// Type
 	marker := string(headerByte[0:3])
-	if marker != "TAG" {
+	if marker != id3MarkerName {
 		return nil, ErrFileMarker
 	}
 	header.Type = marker
@@ -93,7 +87,8 @@ func ReadID3v1(input io.ReadSeeker) (*ID3v1, error) {
 	}
 
 	// Comment
-	// The track number is stored in the last two bytes of the comment field. If the comment is 29 or 30 characters long, no track number can be stored
+	// The track number is stored in the last two bytes of the comment field.
+	// If the comment is 29 or 30 characters long, no track number can be stored
 	if headerByte[125] == 0 {
 		header.Comment = stringBeforeZero(headerByte[97:125])
 		header.ZeroByte = 0
@@ -124,7 +119,7 @@ func ReadID3v1(input io.ReadSeeker) (*ID3v1, error) {
 	return &header, nil
 }
 
-// Return string without zero characters
+// Return string without zero characters.
 func stringBeforeZero(data []byte) string {
 	n := bytes.IndexByte(data, 0)
 	if n == -1 {
@@ -150,7 +145,7 @@ func (id3v1 *ID3v1) Save(input io.WriteSeeker) error {
 	}
 
 	// id3v1 marker
-	_, err = input.Write([]byte("TAG"))
+	_, err = input.Write([]byte(id3MarkerName))
 	if err != nil {
 		return err
 	}
@@ -180,6 +175,7 @@ func (id3v1 *ID3v1) Save(input io.WriteSeeker) error {
 	}
 
 	// Track number
+	// nolint:nestif
 	if id3v1.ZeroByte != 0 {
 		if len(id3v1.Comment) > 28 {
 			err = writeString(input, id3v1.Comment, 30)
@@ -244,8 +240,8 @@ func (id3v1 *ID3v1) GetAllTagNames() []string {
 	return result
 }
 
-func (id3v1 *ID3v1) GetVersion() TagVersion {
-	return TagVersionID3v1
+func (id3v1 *ID3v1) GetVersion() Version {
+	return VersionID3v1
 }
 
 func (id3v1 *ID3v1) GetTitle() (string, error) {

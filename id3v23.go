@@ -15,33 +15,33 @@ import (
 	"time"
 )
 
-type Id3v23Flags byte
+type id3v23Flags byte
 
-func (flags Id3v23Flags) String() string {
+func (flags id3v23Flags) String() string {
 	return strconv.Itoa(int(flags))
 }
 
-func (flags Id3v23Flags) IsUnsynchronisation() bool {
+func (flags id3v23Flags) IsUnsynchronisation() bool {
 	return GetBit(byte(flags), 7) == 1
 }
 
-func (flags Id3v23Flags) SetUnsynchronisation(data bool) {
+func (flags id3v23Flags) SetUnsynchronisation(data bool) {
 	SetBit((*byte)(&flags), data, 7)
 }
 
-func (flags Id3v23Flags) HasExtendedHeader() bool {
+func (flags id3v23Flags) HasExtendedHeader() bool {
 	return GetBit(byte(flags), 6) == 1
 }
 
-func (flags Id3v23Flags) SetExtendedHeader(data bool) {
+func (flags id3v23Flags) SetExtendedHeader(data bool) {
 	SetBit((*byte)(&flags), data, 7)
 }
 
-func (flags Id3v23Flags) IsExperimentalIndicator() bool {
+func (flags id3v23Flags) IsExperimentalIndicator() bool {
 	return GetBit(byte(flags), 5) == 1
 }
 
-func (flags Id3v23Flags) SetExperimentalIndicator(data bool) {
+func (flags id3v23Flags) SetExperimentalIndicator(data bool) {
 	SetBit((*byte)(&flags), data, 7)
 }
 
@@ -52,9 +52,9 @@ type ID3v23Frame struct {
 
 type ID3v23 struct {
 	Marker     string // Always 'ID3'
-	Version    TagVersion
+	Version    Version
 	SubVersion int
-	Flags      Id3v23Flags
+	Flags      id3v23Flags
 	Length     int
 	Frames     []ID3v23Frame
 
@@ -63,13 +63,13 @@ type ID3v23 struct {
 
 func (id3v2 *ID3v23) GetAllTagNames() []string {
 	var result []string
-	for _, value := range id3v2.Frames {
-		result = append(result, value.Key)
+	for i := range id3v2.Frames {
+		result = append(result, id3v2.Frames[i].Key)
 	}
 	return result
 }
 
-func (id3v2 *ID3v23) GetVersion() TagVersion {
+func (id3v2 *ID3v23) GetVersion() Version {
 	return id3v2.Version
 }
 
@@ -196,9 +196,9 @@ func (id3v2 *ID3v23) GetPicture() (image.Image, error) {
 		return nil, err
 	}
 	switch pic.MIME {
-	case "image/jpeg":
+	case mimeImageJPEG:
 		return jpeg.Decode(bytes.NewReader(pic.Data))
-	case "image/png":
+	case mimeImagePNG:
 		return png.Decode(bytes.NewReader(pic.Data))
 	default:
 		return nil, ErrIncorrectTag
@@ -221,9 +221,25 @@ func (id3v2 *ID3v23) SetYear(year int) error {
 	curDate, err := id3v2.GetTimestamp("TYER")
 	if err != nil {
 		// set only year
-		return id3v2.SetTimestamp("TYER", time.Date(year, 0, 0, 0, 0, 0, 0, time.Local))
+		return id3v2.SetTimestamp(
+			"TYER",
+			time.Date(year, 0, 0, 0, 0, 0, 0, time.Local),
+		)
 	}
-	return id3v2.SetTimestamp("TYER", time.Date(year, curDate.Month(), curDate.Day(), curDate.Hour(), curDate.Minute(), curDate.Second(), curDate.Nanosecond(), curDate.Location()))
+
+	return id3v2.SetTimestamp(
+		"TYER",
+		time.Date(
+			year,
+			curDate.Month(),
+			curDate.Day(),
+			curDate.Hour(),
+			curDate.Minute(),
+			curDate.Second(),
+			curDate.Nanosecond(),
+			curDate.Location(),
+		),
+	)
 }
 
 func (id3v2 *ID3v23) SetComment(comment string) error {
@@ -311,7 +327,7 @@ func (id3v2 *ID3v23) SetPicture(picture image.Image) error {
 		return id3v2.SetAttachedPicture(&newPicture)
 	}
 	// save metainfo
-	attacheched.MIME = "image/png"
+	attacheched.MIME = mimeImagePNG
 	attacheched.Data = buf.Bytes()
 
 	return id3v2.SetAttachedPicture(attacheched)
@@ -418,13 +434,13 @@ func (id3v2 *ID3v23) SaveFile(path string) error {
 
 func (id3v2 *ID3v23) Save(input io.WriteSeeker) error {
 	// write header
-	err := id3v2.writeHeaderId3v23(input)
+	err := id3v2.writeHeaderID3v23(input)
 	if err != nil {
 		return err
 	}
 
 	// write tags
-	err = id3v2.writeFramesId3v23(input)
+	err = id3v2.writeFramesID3v23(input)
 	if err != nil {
 		return err
 	}
@@ -437,11 +453,11 @@ func (id3v2 *ID3v23) Save(input io.WriteSeeker) error {
 	return nil
 }
 
-func (id3v2 *ID3v23) writeHeaderId3v23(writer io.Writer) error {
+func (id3v2 *ID3v23) writeHeaderID3v23(writer io.Writer) error {
 	headerByte := make([]byte, 10)
 
 	// ID3
-	copy(headerByte[0:3], "ID3")
+	copy(headerByte[0:3], id3MarkerValue)
 
 	// Version, Subversion, Flags
 	copy(headerByte[3:6], []byte{3, 0, 0})
@@ -456,22 +472,20 @@ func (id3v2 *ID3v23) writeHeaderId3v23(writer io.Writer) error {
 		return err
 	}
 	if nWritten != 10 {
-		return errors.New("Writing error")
+		return ErrWriting
 	}
 	return nil
 }
 
-func (id3v2 *ID3v23) writeFramesId3v23(writer io.Writer) error {
-	for _, tag := range id3v2.Frames {
+func (id3v2 *ID3v23) writeFramesID3v23(writer io.Writer) error {
+	for i := range id3v2.Frames {
 		header := make([]byte, 10)
 
 		// Frame id
-		for i, val := range tag.Key {
-			header[i] = byte(val)
-		}
+		copy(header, id3v2.Frames[i].Key)
 
 		// Frame size
-		length := len(tag.Value)
+		length := len(id3v2.Frames[i].Value)
 		header[4] = byte(length >> 24)
 		header[5] = byte(length >> 16)
 		header[6] = byte(length >> 8)
@@ -484,7 +498,7 @@ func (id3v2 *ID3v23) writeFramesId3v23(writer io.Writer) error {
 		}
 
 		// write data
-		_, err = writer.Write(tag.Value)
+		_, err = writer.Write(id3v2.Frames[i].Value)
 		if err != nil {
 			return err
 		}
@@ -495,9 +509,9 @@ func (id3v2 *ID3v23) writeFramesId3v23(writer io.Writer) error {
 
 func (id3v2 *ID3v23) getFramesLength() int {
 	result := 0
-	for _, tag := range id3v2.Frames {
+	for i := range id3v2.Frames {
 		// 10 - size of tag header
-		result += 10 + len(tag.Value)
+		result += 10 + len(id3v2.Frames[i].Value)
 	}
 	return result
 }
@@ -509,8 +523,8 @@ func (id3v2 *ID3v23) String() string {
 		"Flags: " + id3v2.Flags.String() + "\n" +
 		"Length: " + strconv.Itoa(id3v2.Length) + "\n"
 
-	for _, frame := range id3v2.Frames {
-		result += frame.Key + ": " + string(frame.Value) + "\n"
+	for i := range id3v2.Frames {
+		result += id3v2.Frames[i].Key + ": " + string(id3v2.Frames[i].Value) + "\n"
 	}
 
 	return result
@@ -529,18 +543,15 @@ func checkID3v23(input io.ReadSeeker) bool {
 	marker := string(data[0:3])
 
 	// id3v2
-	if marker != "ID3" {
+	if marker != id3MarkerValue {
 		return false
 	}
 
 	versionByte := data[3]
-	if versionByte != 3 {
-		return false
-	}
-
-	return true
+	return versionByte == 3
 }
 
+// nolint:funlen
 func ReadID3v23(input io.ReadSeeker) (*ID3v23, error) {
 	header := ID3v23{}
 	if input == nil {
@@ -569,7 +580,7 @@ func ReadID3v23(input io.ReadSeeker) (*ID3v23, error) {
 
 	// Marker
 	marker := string(headerByte[0:3])
-	if marker != "ID3" {
+	if marker != id3MarkerValue {
 		return nil, errors.New("error file marker")
 	}
 	header.Marker = marker
@@ -585,7 +596,7 @@ func ReadID3v23(input io.ReadSeeker) (*ID3v23, error) {
 	header.SubVersion = int(subVersionByte)
 
 	// Flags
-	header.Flags = Id3v23Flags(headerByte[5])
+	header.Flags = id3v23Flags(headerByte[5])
 
 	// Length
 	length := ByteToIntSynchsafe(headerByte[6:10])
@@ -641,9 +652,9 @@ func ReadID3v23(input io.ReadSeeker) (*ID3v23, error) {
 }
 
 func (id3v2 *ID3v23) GetString(name string) (string, error) {
-	for _, val := range id3v2.Frames {
-		if val.Key == name {
-			return GetString(val.Value)
+	for i := range id3v2.Frames {
+		if id3v2.Frames[i].Key == name {
+			return GetString(id3v2.Frames[i].Value)
 		}
 	}
 	return "", ErrTagNotFound
@@ -655,12 +666,15 @@ func (id3v2 *ID3v23) SetString(name string, value string) error {
 		Value: SetString(value),
 	}
 
-	for i, val := range id3v2.Frames {
-		if val.Key == name {
-			id3v2.Frames[i] = frame
+	// if found set new frame value
+	for i := range id3v2.Frames {
+		if id3v2.Frames[i].Key == name {
+			id3v2.Frames[i].Value = frame.Value
 			return nil
 		}
 	}
+
+	// if not found add new frame to frames
 	id3v2.Frames = append(id3v2.Frames, frame)
 	return nil
 }
@@ -724,6 +738,7 @@ func (id3v2 *ID3v23) GetAttachedPicture() (*AttachedPicture, error) {
 	return &picture, nil
 }
 
+// nolint:gocritic
 func (id3v2 *ID3v23) SetAttachedPicture(picture *AttachedPicture) error {
 	// set UTF-8
 	result := []byte{0}
@@ -747,25 +762,27 @@ func (id3v2 *ID3v23) SetAttachedPicture(picture *AttachedPicture) error {
 
 func (id3v2 *ID3v23) DeleteTag(name string) error {
 	index := -1
-	for i, val := range id3v2.Frames {
-		if val.Key == name {
+	for i := range id3v2.Frames {
+		if id3v2.Frames[i].Key == name {
 			index = i
 			break
 		}
 	}
-	// already deleted
+
+	// already deleted or not exist
 	if index == -1 {
 		return nil
 	}
+
 	id3v2.Frames = append(id3v2.Frames[:index], id3v2.Frames[index+1:]...)
 	return nil
 }
 
 func (id3v2 *ID3v23) DeleteTagTXXX(name string) error {
 	index := -1
-	for i, val := range id3v2.Frames {
-		if val.Key == "TXXX" {
-			str, err := GetString(val.Value)
+	for i := range id3v2.Frames {
+		if id3v2.Frames[i].Key == id3v2FrameTXXX {
+			str, err := GetString(id3v2.Frames[i].Value)
 			if err != nil {
 				return err
 			}
@@ -779,7 +796,8 @@ func (id3v2 *ID3v23) DeleteTagTXXX(name string) error {
 			}
 		}
 	}
-	// already deleted
+
+	// already deleted or not exist
 	if index == -1 {
 		return nil
 	}
@@ -788,14 +806,15 @@ func (id3v2 *ID3v23) DeleteTagTXXX(name string) error {
 	return nil
 }
 
+// GetStringTXXX - read TXXX frame
 // Header for 'User defined text information frame'
 // Text encoding     $xx
 // Description       <text string according to encoding> $00 (00)
-// Value             <text string according to encoding>
+// Value             <text string according to encoding>.
 func (id3v2 *ID3v23) GetStringTXXX(name string) (string, error) {
-	for _, val := range id3v2.Frames {
-		if val.Key == "TXXX" {
-			str, err := GetString(val.Value)
+	for i := range id3v2.Frames {
+		if id3v2.Frames[i].Key == id3v2FrameTXXX {
+			str, err := GetString(id3v2.Frames[i].Value)
 			if err != nil {
 				return "", err
 			}
@@ -818,9 +837,9 @@ func (id3v2 *ID3v23) SetStringTXXX(name string, value string) error {
 	}
 
 	// find tag
-	for i, val := range id3v2.Frames {
-		if val.Key == "TXXX" {
-			str, err := GetString(val.Value)
+	for i := range id3v2.Frames {
+		if id3v2.Frames[i].Key == id3v2FrameTXXX {
+			str, err := GetString(id3v2.Frames[i].Value)
 			if err != nil {
 				continue
 			}

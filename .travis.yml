@@ -6,7 +6,7 @@ env:
   - GO111MODULE=on
 
 go:
-  - 1.12.x
+  - 1.17.x
 
 git:
   depth: 1
@@ -17,7 +17,7 @@ notifications:
   email: false
 
 script:
-  - go test -v -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./tests
+  - make test
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

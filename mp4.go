@@ -11,32 +11,32 @@ import (
 	"time"
 )
 
-const MP4_MARKER = "ftyp"
-const MP4_MOOV_ATOM = "moov"
-const MP4_META_ATOM = "meta"
-const MP4_META_UPTA = "udta"
-const MP4_META_ILST = "ilst"
+const Mp4Marker = "ftyp"
+const Mp4MoovAtom = "moov"
+const Mp4MetaAtom = "meta"
+const Mp4MetaUpta = "udta"
+const Mp4MetaIlst = "ilst"
 
-const MP4_TAG_ALBUM = "album"
-const MP4_TAG_ARTIST = "artist"
-const MP4_TAG_ALBUM_ARTIST = "album_artist"
-const MP4_TAG_YEAR = "year"
-const MP4_TAG_TITLE = "title"
-const MP4_TAG_GENRE = "genre"
-const MP4_TAG_TRACK = "track"
-const MP4_TAG_COMPOSER = "composer"
-const MP4_TAG_ENCODER = "encoder"
-const MP4_TAG_COPYRIGHT = "copyright"
-const MP4_TAG_PICTURE = "picture"
-const MP4_TAG_GROUPING = "grouping"
-const MP4_TAG_KEYWORD = "keyword"
-const MP4_TAG_LYRICS = "lyrics"
-const MP4_TAG_COMMENT = "comment"
-const MP4_TAG_TEMPO = "tempo"
-const MP4_TAG_COMPILATION = "compilation"
-const MP4_TAG_DISC = "disk"
+const Mp4TagAlbum = "album"
+const Mp4TagArtist = "artist"
+const Mp4TagAlbumArtist = "album_artist"
+const Mp4TagYear = "year"
+const Mp4TagTitle = "title"
+const Mp4TagGenre = "genre"
+const Mp4TagTrack = "track"
+const Mp4TagComposer = "composer"
+const Mp4TagEncoder = "encoder"
+const Mp4TagCopyright = "copyright"
+const Mp4TagPicture = "picture"
+const Mp4TagGrouping = "grouping"
+const Mp4TagKeyword = "keyword"
+const Mp4TagLyrics = "lyrics"
+const Mp4TagComment = "comment"
+const Mp4TagTempo = "tempo"
+const Mp4TagCompilation = "compilation"
+const Mp4TagDisc = "disk"
 
-var MP4_TYPES = [...]string{
+var Mp4Types = [...]string{
 	"mp41",
 	"mp42",
 	"isom",
@@ -46,25 +46,25 @@ var MP4_TYPES = [...]string{
 }
 
 var atoms = map[string]string{
-	"\xa9alb": MP4_TAG_ALBUM,
-	"\xa9art": MP4_TAG_ARTIST,
-	"\xa9ART": MP4_TAG_ARTIST,
-	"aART":    MP4_TAG_ALBUM_ARTIST,
-	"\xa9day": MP4_TAG_YEAR,
-	"\xa9nam": MP4_TAG_TITLE,
-	"\xa9gen": MP4_TAG_GENRE,
-	"trkn":    MP4_TAG_TRACK,
-	"\xa9wrt": MP4_TAG_COMPOSER,
-	"\xa9too": MP4_TAG_ENCODER,
-	"cprt":    MP4_TAG_COPYRIGHT,
-	"covr":    MP4_TAG_PICTURE,
-	"\xa9grp": MP4_TAG_GROUPING,
-	"keyw":    MP4_TAG_KEYWORD,
-	"\xa9lyr": MP4_TAG_LYRICS,
-	"\xa9cmt": MP4_TAG_COMMENT,
-	"tmpo":    MP4_TAG_TEMPO,
-	"cpil":    MP4_TAG_COMPILATION,
-	"disk":    MP4_TAG_DISC,
+	"\xa9alb": Mp4TagAlbum,
+	"\xa9art": Mp4TagArtist,
+	"\xa9ART": Mp4TagArtist,
+	"aART":    Mp4TagAlbumArtist,
+	"\xa9day": Mp4TagYear,
+	"\xa9nam": Mp4TagTitle,
+	"\xa9gen": Mp4TagGenre,
+	"trkn":    Mp4TagTrack,
+	"\xa9wrt": Mp4TagComposer,
+	"\xa9too": Mp4TagEncoder,
+	"cprt":    Mp4TagCopyright,
+	"covr":    Mp4TagPicture,
+	"\xa9grp": Mp4TagGrouping,
+	"keyw":    Mp4TagKeyword,
+	"\xa9lyr": Mp4TagLyrics,
+	"\xa9cmt": Mp4TagComment,
+	"tmpo":    Mp4TagTempo,
+	"cpil":    Mp4TagCompilation,
+	"disk":    Mp4TagDisc,
 }
 
 type MP4 struct {
@@ -75,8 +75,8 @@ func (MP4) GetAllTagNames() []string {
 	panic("implement me")
 }
 
-func (mp4 *MP4) GetVersion() TagVersion {
-	return TagVersionMP4
+func (mp4 *MP4) GetVersion() Version {
+	return VersionMP4
 }
 
 func (MP4) GetFileData() []byte {
@@ -84,19 +84,19 @@ func (MP4) GetFileData() []byte {
 }
 
 func (mp4 *MP4) GetTitle() (string, error) {
-	return mp4.getString(MP4_TAG_TITLE)
+	return mp4.getString(Mp4TagTitle)
 }
 
 func (mp4 *MP4) GetArtist() (string, error) {
-	return mp4.getString(MP4_TAG_ARTIST)
+	return mp4.getString(Mp4TagArtist)
 }
 
 func (mp4 *MP4) GetAlbum() (string, error) {
-	return mp4.getString(MP4_TAG_ALBUM)
+	return mp4.getString(Mp4TagAlbum)
 }
 
 func (mp4 *MP4) GetYear() (int, error) {
-	year, err := mp4.getString(MP4_TAG_YEAR)
+	year, err := mp4.getString(Mp4TagYear)
 	if err != nil {
 		return 0, err
 	}
@@ -108,11 +108,11 @@ func (MP4) GetComment() (string, error) {
 }
 
 func (mp4 *MP4) GetGenre() (string, error) {
-	return mp4.getString(MP4_TAG_GENRE)
+	return mp4.getString(Mp4TagGenre)
 }
 
 func (mp4 *MP4) GetAlbumArtist() (string, error) {
-	return mp4.getString(MP4_TAG_ALBUM_ARTIST)
+	return mp4.getString(Mp4TagAlbumArtist)
 }
 
 func (MP4) GetDate() (time.Time, error) {
@@ -140,7 +140,7 @@ func (MP4) GetCompilation() (string, error) {
 }
 
 func (mp4 *MP4) GetComposer() (string, error) {
-	return mp4.getString(MP4_TAG_COMPOSER)
+	return mp4.getString(Mp4TagComposer)
 }
 
 func (MP4) GetConductor() (string, error) {
@@ -148,7 +148,7 @@ func (MP4) GetConductor() (string, error) {
 }
 
 func (mp4 *MP4) GetCopyright() (string, error) {
-	return mp4.getString(MP4_TAG_COPYRIGHT)
+	return mp4.getString(Mp4TagCopyright)
 }
 
 func (MP4) GetDescription() (string, error) {
@@ -160,15 +160,15 @@ func (MP4) GetDiscNumber() (int, int, error) {
 }
 
 func (mp4 *MP4) GetEncodedBy() (string, error) {
-	return mp4.getString(MP4_TAG_ENCODER)
+	return mp4.getString(Mp4TagEncoder)
 }
 
 func (mp4 *MP4) GetTrackNumber() (int, int, error) {
-	track, err := mp4.getInt(MP4_TAG_TRACK)
+	track, err := mp4.getInt(Mp4TagTrack)
 	if err != nil {
 		return 0, 0, err
 	}
-	total, err2 := mp4.getInt(MP4_TAG_TRACK + "_TOTAL")
+	total, err2 := mp4.getInt(Mp4TagTrack + "_TOTAL")
 	if err2 != nil {
 		return 0, 0, err2
 	}
@@ -176,11 +176,15 @@ func (mp4 *MP4) GetTrackNumber() (int, int, error) {
 }
 
 func (mp4 *MP4) GetPicture() (image.Image, error) {
-	pictureBlock, ok := mp4.data[MP4_TAG_PICTURE]
+	pictureBlock, ok := mp4.data[Mp4TagPicture]
 	if !ok {
 		return nil, ErrTagNotFound
 	}
-	picture := pictureBlock.(AttachedPicture)
+	picture, ok := pictureBlock.(AttachedPicture)
+	if !ok {
+		return nil, ErrNotPictureBlock
+	}
+
 	switch picture.MIME {
 	case "image/jpeg":
 		return jpeg.Decode(bytes.NewReader(picture.Data))
@@ -398,9 +402,9 @@ func checkMp4(input io.ReadSeeker) bool {
 	}
 	marker := string(data[4:8])
 
-	if marker == MP4_MARKER {
+	if marker == Mp4Marker {
 		mp4type := string(data[8:12])
-		for _, t := range MP4_TYPES {
+		for _, t := range Mp4Types {
 			if mp4type == t {
 				return true
 			}
@@ -444,7 +448,7 @@ func ReadMp4(input io.ReadSeeker) (*MP4, error) {
 			break
 		}
 
-		if name == MP4_MOOV_ATOM {
+		if name == Mp4MoovAtom {
 			parseMoovAtom(bytes, &header)
 		}
 	}
@@ -457,14 +461,14 @@ func parseMoovAtom(bytes []byte, mp4 *MP4) {
 		size := binary.BigEndian.Uint32(bytes[0:4])
 		name := string(bytes[4:8])
 
-		if name == MP4_META_ATOM {
+		switch name {
+		case Mp4MetaAtom:
 			bytes = bytes[4:]
-			size = size - 4
+			size -= 4
 			parseMoovAtom(bytes[8:], mp4)
-
-		} else if name == MP4_META_UPTA || name == MP4_META_ILST {
+		case Mp4MetaUpta, Mp4MetaIlst:
 			parseMoovAtom(bytes[8:], mp4)
-		} else {
+		default:
 			atomName, ok := atoms[name]
 			if ok {
 				parseAtomData(bytes[8:size], atomName, mp4)
@@ -483,7 +487,6 @@ func parseAtomData(bytes []byte, atomName string, mp4 *MP4) {
 	// TODO : different types
 	value := string(bytes[16:])
 	mp4.data[atomName] = value
-	//println(atomName)
 
 	datatype := binary.BigEndian.Uint32(bytes[8:12])
 	if datatype == 13 {
@@ -491,10 +494,9 @@ func parseAtomData(bytes []byte, atomName string, mp4 *MP4) {
 			MIME: "image/jpeg",
 			Data: bytes[16:],
 		}
-
 	}
 
-	if atomName == MP4_TAG_TRACK || atomName == MP4_TAG_DISC {
+	if atomName == Mp4TagTrack || atomName == Mp4TagDisc {
 		mp4.data[atomName] = int(bytes[19:20][0])
 		mp4.data[atomName+"_TOTAL"] = int(bytes[21:22][0])
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// nolint:gocyclo
 func GetMap(metadata Metadata) map[string]interface{} {
 	var tags = map[string]interface{}{}
 	var val interface{}
@@ -60,7 +61,7 @@ func GetMap(metadata Metadata) map[string]interface{} {
 	if val, err = metadata.GetDescription(); err == nil {
 		tags["description"] = val
 	}
-	if number, total, err := metadata.GetDiscNumber(); err == nil {
+	if number, total, errGetDiskNumber := metadata.GetDiscNumber(); errGetDiskNumber == nil {
 		tags["disc number"] = fmt.Sprintf("%d/%d", number, total)
 	}
 	if val, err = metadata.GetEncodedBy(); err == nil {

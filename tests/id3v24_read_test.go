@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// nolint:funlen
 func TestId3v24Read(t *testing.T) {
 	asrt := assert.New(t)
 	id3, err := tag.ReadFile("meow_id2.4.mp3")

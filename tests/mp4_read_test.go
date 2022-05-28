@@ -69,5 +69,4 @@ func TestMp4Read(t *testing.T) {
 	asrt.NoError(err)
 	cmp := compareFiles("cat_walking_cover.jpg", out.Name())
 	asrt.Equal(true, cmp)
-
 }

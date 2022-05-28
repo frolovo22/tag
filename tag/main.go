@@ -55,7 +55,7 @@ func main() {
 				extension := filepath.Ext(output)
 				switch extension {
 				case ".json":
-					data, err := json.Marshal(&struct {
+					data, errMarshal := json.Marshal(&struct {
 						Version  string                 `json:"version"`
 						FileName string                 `json:"file name"`
 						FileSize int64                  `json:"file size (bytes)"`
@@ -66,26 +66,26 @@ func main() {
 						FileSize: stat.Size(),
 						Tags:     tags,
 					})
-					if err != nil {
+					if errMarshal != nil {
 						return err
 					}
 
 					// save to file
-					file, err := os.Create(output)
-					if err != nil {
+					file, errCreate := os.Create(output)
+					if errCreate != nil {
 						return err
 					}
 					defer file.Close()
 
-					_, err = file.Write(data)
-					if err != nil {
-						return err
+					_, errWrite := file.Write(data)
+					if errWrite != nil {
+						return errWrite
 					}
 
 				default:
-					fmt.Println(fmt.Sprintf("%s: %v", "version", metadata.GetVersion()))
+					fmt.Printf("%s: %v\n", "version", metadata.GetVersion())
 					for key, val := range tags {
-						fmt.Println(fmt.Sprintf("%-20s: %v", key, val))
+						fmt.Printf("%-20s: %v\n", key, val)
 					}
 				}
 
