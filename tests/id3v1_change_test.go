@@ -7,6 +7,7 @@ import (
 	"testing"
 )
 
+// nolint:funlen
 func TestId3v1Change(t *testing.T) {
 	asrt := assert.New(t)
 

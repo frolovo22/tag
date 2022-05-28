@@ -2,7 +2,7 @@ package tag
 
 type Genre byte
 
-// The following genres is defined in ID3v1
+// The following genres is defined in ID3v1.
 var genres = map[Genre]string{
 	0:   "Blues",
 	1:   "Classic Rock",
@@ -104,7 +104,7 @@ var genres = map[Genre]string{
 	97:  "Chorus",
 	98:  "Easy Listening",
 	99:  "Acoustic",
-	100: "Humour",
+	100: "Humor",
 	101: "Speech",
 	102: "Chanson",
 	103: "Opera",
@@ -190,7 +190,7 @@ var genres = map[Genre]string{
 	181: "World Music",
 	182: "Neoclassical",
 	183: "Audiobook",
-	184: "Audio Theatre",
+	184: "Audio Theater",
 	185: "Neue Deutsche Welle",
 	186: "Podcast",
 	187: "Indie Rock",

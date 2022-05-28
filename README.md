@@ -1,6 +1,8 @@
+[![version: golang-version](https://img.shields.io/badge/Go-v1.17-blue.svg)](https://git.exness.io/notifications/api/-/blob/master/go.mod)
 [![Build Status](https://travis-ci.org/frolovo22/tag.svg?branch=master)](https://travis-ci.org/frolovo22/tag)
 [![Go Report Card](https://goreportcard.com/badge/github.com/frolovo22/tag)](https://goreportcard.com/report/github.com/frolovo22/tag)
 [![codecov](https://codecov.io/gh/frolovo22/tag/branch/master/graph/badge.svg)](https://codecov.io/gh/frolovo22/tag)
+
 # Tag
 
 Its pure golang library for parsing and editing tags in mp3, mp4 and flac formats
@@ -12,6 +14,7 @@ go get github.com/frolovo22/tag
 ```
 
 For using command line arguments
+
 ```go 
 go install github.com/frolovo22/tag
 ```
@@ -41,32 +44,36 @@ go install github.com/frolovo22/tag
 | Encoded by        | -           | TEN     | TENC                  | TENC                  | \xa9too         | ENCODED-BY             |
 | Track Number      | TrackNumber | TRK     | TRCK                  | TRCK                  | trkn            | TRACKNUMBER            |  
 | Picture           | -           | PIC     | APIC                  | APIC                  | covr            | METADATA_BLOCK_PICTURE |
-       
-# Status 
+
+# Status
+
 In progress  
 Future features:
-*  Support all tags (id3 v1, v1.1, v2.2, v2.3, v2.4, mp4, flac)
-*  Fix errors in files (empty tags, incorrect size, tag size, tag parameters)
-*  Command line arguments 
 
-| Format | Read                      | Set                       | Delete                     |  Save                     |
+* Support all tags (id3 v1, v1.1, v2.2, v2.3, v2.4, mp4, flac)
+* Fix errors in files (empty tags, incorrect size, tag size, tag parameters)
+* Command line arguments
+
+| Format | Read                      | Set                       | Delete                     | Save                      |
 |--------|---------------------------|---------------------------|----------------------------|---------------------------|
 | idv1   | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 | idv1.1 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
-| idv2.2 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
+| idv2.2 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [ ] </li></ul> |
 | idv2.3 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 | idv2.4 | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 | mp4    | <ul><li> - [x] </li></ul> | <ul><li> - [ ] </li></ul> | <ul><li> - [ ] </li></ul>  | <ul><li> - [ ] </li></ul> |
-| FLAC   | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [ ] </li></ul> |
+| FLAC   | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul> | <ul><li> - [x] </li></ul>  | <ul><li> - [x] </li></ul> |
 
 # Command line arguments
 
 Cli info
+
 ```bash
 tag help
 ```
 
 For read tags use
+
 ```bash
 tag read -in "path/to/file"
 # example output
@@ -83,9 +90,11 @@ comment             : catcomment
 ```
 
 for save meta information use
+
 ```bash
 tag read -in "path/to/file" -out "path/to/outputfile.json"
 ```
+
 Now supported only json output file
 
 # How to use
@@ -93,14 +102,16 @@ Now supported only json output file
 ```go
 tags, err := tag.ReadFile("song.mp3")
 if err != nil {
-	return err
+return err
 }
 fmt.Println(tags.GetTitle())
 ```
 
-```tag.ReadFile or tag.Read``` return interface ```Metadata```:  
+```tag.ReadFile or tag.Read``` return interface ```Metadata```:
 
-```go 
+```go
+package tag
+
 type Metadata interface {
 	GetMetadata
 	SetMetadata
@@ -110,7 +121,7 @@ type Metadata interface {
 
 type GetMetadata interface {
 	GetAllTagNames() []string
-	GetVersion() TagVersion
+	GetVersion() Version
 	GetFileData() []byte // all another file data
 
 	GetTitle() (string, error)
@@ -193,47 +204,61 @@ type SaveMetadata interface {
 ```   
 
 Also you can read defined format. For Example:
+
 ```go
-file, err := os.Open("path/to/file")
-if err != nil {
-	return err
-}
-defer file.Close()
+package main
 
-id3v2, err := tag.ReadID3v24(file)
-if err != nil {
-	return err
-}
+import (
+	"fmt"
+	"github.com/frolovo22/tag"
+	"os"
+)
 
-// Get tag value by name
-value, err := id3v2.GetString("TIT2")
-if err != nil {
-	return err
-}
-fmt.Println("title: " + value)
+func Read() error {
+	file, err := os.Open("path/to/file")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 
-// Set tag value
-err = id3v2.SetString("TIT2", "Title")
-if err != nil {
-	return err
-}
+	id3v2, err := tag.ReadID3v24(file)
+	if err != nil {
+		return err
+	}
 
-// User defined tags
-value, err = id3v2.GetStringTXXX("MYTAG")
-if err != nil {
-	return err
-}
-fmt.Println("my tag: " + value)
+	// Get tag value by name
+	value, err := id3v2.GetString("TIT2")
+	if err != nil {
+		return err
+	}
+	fmt.Println("title: " + value)
 
-// Set user tag
-err = id3v2.SetStringTXXX("MYTAG222", "Dogs")
-if err != nil {
-	return err
-}
+	// Set tag value
+	err = id3v2.SetString("TIT2", "Title")
+	if err != nil {
+		return err
+	}
 
-// Save changes
-err = id3v2.SaveFile("path/to/file")
-if err != nil {
-	return err
+	// User defined tags
+	value, err = id3v2.GetStringTXXX("MYTAG")
+	if err != nil {
+		return err
+	}
+	fmt.Println("my tag: " + value)
+
+	// Set user tag
+	err = id3v2.SetStringTXXX("MYTAG222", "Dogs")
+	if err != nil {
+		return err
+	}
+
+	// Save changes
+	err = id3v2.SaveFile("path/to/file")
+	if err != nil {
+		return err
+	}
 }
 ``` 
+
+# Contribution
+

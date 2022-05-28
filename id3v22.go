@@ -13,8 +13,6 @@ import (
 	"time"
 )
 
-const FRAME_HEADER_SIZE = 6
-
 type ID3v22Frame struct {
 	Key   string
 	Value []byte
@@ -30,8 +28,8 @@ func (id3v2 *ID3v22) GetAllTagNames() []string {
 	panic("implement me")
 }
 
-func (id3v2 *ID3v22) GetVersion() TagVersion {
-	panic("implement me")
+func (id3v2 *ID3v22) GetVersion() Version {
+	return VersionID3v22
 }
 
 func (id3v2 *ID3v22) GetFileData() []byte {
@@ -164,9 +162,9 @@ func (id3v2 *ID3v22) GetPicture() (image.Image, error) {
 		return nil, err
 	}
 	switch pic.MIME {
-	case "image/jpeg":
+	case mimeImageJPEG:
 		return jpeg.Decode(bytes.NewReader(pic.Data))
-	case "image/png":
+	case mimeImagePNG:
 		return png.Decode(bytes.NewReader(pic.Data))
 	default:
 		return nil, ErrIncorrectTag
@@ -184,9 +182,9 @@ func (id3v2 *ID3v22) GetAttachedPicture() (*AttachedPicture, error) {
 	textEncoding := bytes[0]
 	mimeText := string(bytes[1:4])
 	if mimeText == "JPG" {
-		picture.MIME = "image/jpeg"
+		picture.MIME = mimeImageJPEG
 	} else if mimeText == "PNG" {
-		picture.MIME = "image/png"
+		picture.MIME = mimeImagePNG
 	}
 
 	picture.PictureType = bytes[4]
@@ -387,6 +385,7 @@ func (id3v2 *ID3v22) Save(input io.WriteSeeker) error {
 	panic("implement me")
 }
 
+// nolint:gocyclo
 func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 	header := ID3v22{}
 
@@ -416,7 +415,7 @@ func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 
 	// Marker
 	marker := string(headerByte[0:3])
-	if marker != "ID3" {
+	if marker != id3MarkerValue {
 		return nil, errors.New("error file marker")
 	}
 
@@ -434,7 +433,7 @@ func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 
 	curRead := 0
 	for curRead < length {
-		bytesExtendedHeader := make([]byte, FRAME_HEADER_SIZE)
+		bytesExtendedHeader := make([]byte, id3v22FrameHeaderSize)
 		nReaded, err = input.Read(bytesExtendedHeader)
 		if err != nil {
 			return nil, err
@@ -446,7 +445,7 @@ func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 		key := string(bytesExtendedHeader[0:3])
 
 		// Frame data size
-		size := ByteToInt(bytesExtendedHeader[3:FRAME_HEADER_SIZE])
+		size := ByteToInt(bytesExtendedHeader[3:id3v22FrameHeaderSize])
 
 		bytesExtendedValue := make([]byte, size)
 		nReaded, err = input.Read(bytesExtendedValue)
@@ -467,7 +466,6 @@ func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 			if pos != -1 {
 				bytesExtendedValue = bytesExtendedValue[0:pos]
 			}
-
 		}
 
 		header.Frames = append(header.Frames, ID3v22Frame{
@@ -475,8 +473,7 @@ func ReadID3v22(input io.ReadSeeker) (*ID3v22, error) {
 			bytesExtendedValue,
 		})
 
-		curRead += FRAME_HEADER_SIZE + size
-
+		curRead += id3v22FrameHeaderSize + size
 	}
 	return &header, nil
 }
@@ -494,32 +491,27 @@ func checkID3v22(input io.ReadSeeker) bool {
 	marker := string(data[0:3])
 
 	// id3v2
-	if marker != "ID3" {
+	if marker != id3MarkerValue {
 		return false
 	}
 
 	versionByte := data[3]
-
-	if versionByte != 2 {
-		return false
-	}
-
-	return true
+	return versionByte == 2
 }
 
 func (id3v2 *ID3v22) GetString(name string) (string, error) {
-	for _, val := range id3v2.Frames {
-		if val.Key == name {
-			return GetString(val.Value)
+	for i := range id3v2.Frames {
+		if id3v2.Frames[i].Key == name {
+			return GetString(id3v2.Frames[i].Value)
 		}
 	}
 	return "", ErrTagNotFound
 }
 
 func (id3v2 *ID3v22) GetBytes(name string) ([]byte, error) {
-	for _, val := range id3v2.Frames {
-		if val.Key == name {
-			return val.Value, nil
+	for i := range id3v2.Frames {
+		if id3v2.Frames[i].Key == name {
+			return id3v2.Frames[i].Value, nil
 		}
 	}
 	return nil, ErrTagNotFound

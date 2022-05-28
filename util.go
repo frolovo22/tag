@@ -3,7 +3,6 @@ package tag
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"image"
 	"image/color"
 	"io"
@@ -57,20 +56,6 @@ func readBytes(input io.Reader, size int) ([]byte, error) {
 	return data, nil
 }
 
-func readString(input io.Reader, size int) (string, error) {
-	data, err := readBytes(input, size)
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
-}
-
-const (
-	encodingUTF8    string = "UTF-8"
-	encodingUTF16   string = "UTF-16"
-	encodingUTF16BE string = "UTF-16BE"
-)
-
 func GetEncoding(code byte) string {
 	if code == 0 || code == 3 {
 		return encodingUTF8
@@ -84,11 +69,11 @@ func GetEncoding(code byte) string {
 	return ""
 }
 
-/*
-*	Text Encoding for text frame header
-*	First byte determinate text encoding. If ISO-8859-1 is used this byte should be $00, if Unicode is used it should be $01
-*	Return text encoding. E.g. "utf8", "utf16", etc.
- */
+// TextEncoding -
+// Text Encoding for text frame header
+// First byte determinate text encoding.
+// If ISO-8859-1 is used this byte should be $00, if Unicode is used it should be $01
+// Return text encoding. E.g. "utf8", "utf16", etc.
 func TextEncoding(b []byte) string {
 	if len(b) == 0 {
 		return ""
@@ -111,13 +96,13 @@ func DecodeString(b []byte, encoding string) (string, error) {
 		return DecodeUTF16BE(b)
 	}
 
-	return "", errors.New("unknown encoding format")
+	return "", ErrEncodingFormat
 }
 
-// Decode UTF-16 Little Endian to UTF-8
+// Decode UTF-16 Little Endian to UTF-8.
 func DecodeUTF16(b []byte) (string, error) {
 	if len(b)%2 != 0 {
-		return "", errors.New("Must have even length byte slice")
+		return "", ErrDecodeEvenLength
 	}
 
 	u16s := make([]uint16, 1)
@@ -137,10 +122,10 @@ func DecodeUTF16(b []byte) (string, error) {
 	return ret.String(), nil
 }
 
-// Decode UTF-16 Big Endian To UTF-8
+// Decode UTF-16 Big Endian To UTF-8.
 func DecodeUTF16BE(b []byte) (string, error) {
 	if len(b)%2 != 0 {
-		return "", errors.New("Must have even length byte slice")
+		return "", ErrDecodeEvenLength
 	}
 
 	u16s := make([]uint16, 1)
@@ -160,6 +145,7 @@ func DecodeUTF16BE(b []byte) (string, error) {
 	return ret.String(), nil
 }
 
+// ByteToIntSynchsafe -
 // Convert byte to int
 // In some parts of the tag it is inconvenient to use the
 // unsychronisation scheme because the size of unsynchronised data is
@@ -167,10 +153,9 @@ func DecodeUTF16BE(b []byte) (string, error) {
 // descriptors. The solution in ID3v2 is to use synchsafe integers, in
 // which there can never be any false synchs. Synchsafe integers are
 // integers that keep its highest bit (bit 7) zeroed, making seven bits
-//out of eight available. Thus a 32 bit synchsafe integer can store 28
+// out of eight available. Thus a 32 bit synchsafe integer can store 28
 // bits of information.
 func ByteToIntSynchsafe(data []byte) int {
-	//return int(data[3]) | int(data[2])<<7 | int(data[1])<<14 | int(data[0])<<21
 	result := 0
 	for _, b := range data {
 		result = (result << 7) | int(b)
@@ -188,7 +173,7 @@ func IntToByteSynchsafe(data int) []byte {
 	}
 }
 
-// Convert byte to int
+// Convert byte to int.
 func ByteToInt(data []byte) int {
 	result := 0
 	for _, b := range data {
@@ -199,16 +184,16 @@ func ByteToInt(data []byte) int {
 
 // Return bit value
 // Index starts from 0
-// bits order [7,6,5,4,3,2,1,0]
+// bits order [7,6,5,4,3,2,1,0].
 func GetBit(data byte, index byte) byte {
 	return 1 & (data >> index)
 }
 
 func SetBit(data *byte, bit bool, index byte) {
 	if bit {
-		*data = *data | (1 << index)
+		*data |= 1 << index
 	} else {
-		*data = *data & (^(1 << index))
+		*data &= ^(1 << index)
 	}
 }
 
@@ -228,7 +213,7 @@ func SetString(value string) []byte {
 
 // Read format:
 // [length, data]
-// length in littleIndian
+// length in littleIndian.
 func readLengthData(input io.Reader, order binary.ByteOrder) ([]byte, error) {
 	// length
 	var length uint32
@@ -260,14 +245,18 @@ func writeLengthData(output io.Writer, order binary.ByteOrder, data []byte) erro
 }
 
 func downloadImage(url string) (image.Image, error) {
+	// nolint:gosec
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	img, _, err := image.Decode(resp.Body)
 	return img, err
 }
 
+// nolint:deadcode,unused
 func colorModelToBitsPerPixel(model color.Model) int {
 	var bpp int
 	switch model {
@@ -290,6 +279,7 @@ func colorModelToBitsPerPixel(model color.Model) int {
 	default:
 		bpp = 8
 	}
+
 	return bpp
 }
 
