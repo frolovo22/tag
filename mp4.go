@@ -491,7 +491,7 @@ func parseAtomData(bytes []byte, atomName string, mp4 *MP4) {
 	datatype := binary.BigEndian.Uint32(bytes[8:12])
 	if datatype == 13 {
 		mp4.data[atomName] = AttachedPicture{
-			MIME: "image/jpeg",
+			MIME: mimeImageJPEG,
 			Data: bytes[16:],
 		}
 	}
