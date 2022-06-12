@@ -14,7 +14,7 @@ import (
 const Mp4Marker = "ftyp"
 const Mp4MoovAtom = "moov"
 const Mp4MetaAtom = "meta"
-const Mp4MetaUpta = "udta"
+const Mp4MetaUdta = "udta"
 const Mp4MetaIlst = "ilst"
 
 const Mp4TagAlbum = "album"
@@ -466,7 +466,7 @@ func parseMoovAtom(bytes []byte, mp4 *MP4) {
 			bytes = bytes[4:]
 			size -= 4
 			parseMoovAtom(bytes[8:], mp4)
-		case Mp4MetaUpta, Mp4MetaIlst:
+		case Mp4MetaUdta, Mp4MetaIlst:
 			parseMoovAtom(bytes[8:], mp4)
 		default:
 			atomName, ok := atoms[name]
